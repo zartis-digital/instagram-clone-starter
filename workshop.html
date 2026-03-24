@@ -1,0 +1,3951 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Claude Code Labs — Instagram Clone Workshop</title>
+        <style>
+            /* ============================================================
+       CSS Variables & Reset
+       ============================================================ */
+            :root {
+                --primary: #cc785c;
+                --primary-light: #e0977f;
+                --primary-dark: #a85f47;
+                --primary-bg: #fdf5f2;
+                --primary-border: #f0d5c8;
+                --success: #5c8a5e;
+                --success-light: #7aab7c;
+                --success-bg: #f0f7f0;
+                --success-border: #c8e0c9;
+                --warning: #b07d3a;
+                --warning-light: #c99b5c;
+                --warning-bg: #fdf6ec;
+                --warning-border: #e8d5b3;
+                --bonus: #7c6bbf;
+                --bonus-light: #9b8ed4;
+                --bonus-bg: #f4f1fb;
+                --bonus-border: #d4cce9;
+                --bg: #ffffff;
+                --bg-secondary: #f8f9fa;
+                --bg-card: #ffffff;
+                --bg-code: #f5f5f5;
+                --text: #1a1a1a;
+                --text-secondary: #5a5a5a;
+                --text-muted: #8a8a8a;
+                --border: #e2e2e2;
+                --border-light: #f0f0f0;
+                --shadow:
+                    0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+                --shadow-md:
+                    0 4px 12px rgba(0, 0, 0, 0.08),
+                    0 2px 4px rgba(0, 0, 0, 0.04);
+                --shadow-lg:
+                    0 8px 24px rgba(0, 0, 0, 0.1), 0 4px 8px rgba(0, 0, 0, 0.05);
+                --radius: 10px;
+                --radius-sm: 6px;
+                --font-sans:
+                    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                    Helvetica, Arial, sans-serif;
+                --font-mono:
+                    "SF Mono", "Cascadia Code", "Fira Code", Consolas, monospace;
+                --transition-fast: 0.15s ease;
+                --transition: 0.25s ease;
+            }
+
+            @media (prefers-color-scheme: dark) {
+                :root {
+                    --primary-bg: #2a1f1a;
+                    --primary-border: #5a3f30;
+                    --success-bg: #1a2a1a;
+                    --success-border: #305a32;
+                    --warning-bg: #2a2418;
+                    --warning-border: #5a4a28;
+                    --bonus-bg: #1e1a2a;
+                    --bonus-border: #3a305a;
+                    --bg: #141414;
+                    --bg-secondary: #1a1a1a;
+                    --bg-card: #1e1e1e;
+                    --bg-code: #252525;
+                    --text: #e8e8e8;
+                    --text-secondary: #aaaaaa;
+                    --text-muted: #6a6a6a;
+                    --border: #333333;
+                    --border-light: #282828;
+                    --shadow:
+                        0 1px 3px rgba(0, 0, 0, 0.2),
+                        0 1px 2px rgba(0, 0, 0, 0.15);
+                    --shadow-md:
+                        0 4px 12px rgba(0, 0, 0, 0.25),
+                        0 2px 4px rgba(0, 0, 0, 0.15);
+                    --shadow-lg:
+                        0 8px 24px rgba(0, 0, 0, 0.3),
+                        0 4px 8px rgba(0, 0, 0, 0.2);
+                }
+            }
+
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            html {
+                scroll-behavior: smooth;
+                -webkit-text-size-adjust: 100%;
+            }
+
+            body {
+                font-family: var(--font-sans);
+                background: var(--bg-secondary);
+                color: var(--text);
+                line-height: 1.6;
+                min-height: 100vh;
+            }
+
+            /* ============================================================
+       Header
+       ============================================================ */
+            .header {
+                background: var(--bg);
+                border-bottom: 1px solid var(--border);
+                padding: 24px 0 20px;
+                position: sticky;
+                top: 0;
+                z-index: 100;
+                box-shadow: var(--shadow);
+            }
+
+            .header-inner {
+                max-width: 880px;
+                margin: 0 auto;
+                padding: 0 24px;
+            }
+
+            .header-top {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 16px;
+            }
+
+            .header-title-group {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                flex-wrap: wrap;
+            }
+
+            .header-title {
+                font-size: 1.35rem;
+                font-weight: 700;
+                color: var(--text);
+                letter-spacing: -0.02em;
+            }
+
+            .header-subtitle {
+                font-size: 0.95rem;
+                color: var(--text-secondary);
+                font-weight: 400;
+            }
+
+            .badge {
+                display: inline-flex;
+                align-items: center;
+                padding: 3px 10px;
+                border-radius: 20px;
+                font-size: 0.72rem;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                background: var(--primary);
+                color: #fff;
+            }
+
+            .reset-btn {
+                background: none;
+                border: 1px solid var(--border);
+                border-radius: var(--radius-sm);
+                padding: 6px 14px;
+                font-size: 0.8rem;
+                color: var(--text-secondary);
+                cursor: pointer;
+                transition: all var(--transition-fast);
+                font-family: var(--font-sans);
+            }
+
+            .reset-btn:hover {
+                border-color: var(--primary);
+                color: var(--primary);
+                background: var(--primary-bg);
+            }
+
+            .progress-area {
+                display: flex;
+                align-items: center;
+                gap: 14px;
+            }
+
+            .progress-bar-track {
+                flex: 1;
+                height: 6px;
+                background: var(--border-light);
+                border-radius: 3px;
+                overflow: hidden;
+            }
+
+            .progress-bar-fill {
+                height: 100%;
+                background: var(--primary);
+                border-radius: 3px;
+                transition: width 0.4s ease;
+                width: 0%;
+            }
+
+            .progress-text {
+                font-size: 0.82rem;
+                color: var(--text-muted);
+                white-space: nowrap;
+                font-weight: 500;
+                min-width: 100px;
+                text-align: right;
+            }
+
+            /* ============================================================
+       Main Container
+       ============================================================ */
+            .container {
+                max-width: 880px;
+                margin: 0 auto;
+                padding: 32px 24px 80px;
+            }
+
+            /* ============================================================
+       Getting Started Section
+       ============================================================ */
+            .getting-started {
+                background: var(--bg-card);
+                border: 1px solid var(--border);
+                border-radius: var(--radius);
+                padding: 32px;
+                margin-bottom: 40px;
+                box-shadow: var(--shadow);
+            }
+
+            .getting-started h2 {
+                font-size: 1.3rem;
+                font-weight: 700;
+                margin-bottom: 24px;
+                letter-spacing: -0.01em;
+            }
+
+            .getting-started h3 {
+                font-size: 1.05rem;
+                font-weight: 600;
+                margin-top: 24px;
+                margin-bottom: 12px;
+                color: var(--text);
+            }
+
+            .getting-started p,
+            .getting-started li {
+                color: var(--text-secondary);
+                font-size: 0.92rem;
+                line-height: 1.7;
+            }
+
+            .getting-started ul {
+                list-style: disc;
+                padding-left: 24px;
+                margin-bottom: 8px;
+            }
+
+            .getting-started ul li {
+                margin-bottom: 4px;
+            }
+
+            .prereq-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 24px;
+                margin-top: 16px;
+            }
+
+            @media (max-width: 640px) {
+                .prereq-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            .prereq-card {
+                background: var(--bg-secondary);
+                border: 1px solid var(--border-light);
+                border-radius: var(--radius-sm);
+                padding: 20px;
+            }
+
+            .prereq-card h4 {
+                font-size: 0.88rem;
+                font-weight: 600;
+                margin-bottom: 10px;
+                text-transform: uppercase;
+                letter-spacing: 0.04em;
+                color: var(--primary);
+            }
+
+            .tech-stack-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+                gap: 8px;
+                margin-top: 8px;
+            }
+
+            .tech-item {
+                background: var(--bg-secondary);
+                border: 1px solid var(--border-light);
+                border-radius: var(--radius-sm);
+                padding: 8px 12px;
+                font-size: 0.85rem;
+                color: var(--text-secondary);
+                font-weight: 500;
+            }
+
+            .project-structure {
+                background: var(--bg-code);
+                border: 1px solid var(--border-light);
+                border-radius: var(--radius-sm);
+                padding: 16px 20px;
+                font-family: var(--font-mono);
+                font-size: 0.82rem;
+                line-height: 1.8;
+                color: var(--text-secondary);
+                overflow-x: auto;
+                margin-top: 8px;
+                white-space: pre;
+            }
+
+            .important-note {
+                background: var(--warning-bg);
+                border: 1px solid var(--warning-border);
+                border-radius: var(--radius-sm);
+                padding: 14px 18px;
+                margin-top: 20px;
+                font-size: 0.88rem;
+                color: var(--text);
+            }
+
+            .important-note strong {
+                color: var(--warning);
+            }
+
+            /* ============================================================
+       Part Headers (section dividers)
+       ============================================================ */
+            .part-header {
+                margin-top: 48px;
+                margin-bottom: 28px;
+                padding-bottom: 12px;
+                border-bottom: 2px solid var(--border);
+            }
+
+            .part-header h2 {
+                font-size: 1.15rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.06em;
+                color: var(--primary);
+            }
+
+            .part-header p {
+                font-size: 0.92rem;
+                color: var(--text-secondary);
+                margin-top: 6px;
+                line-height: 1.6;
+            }
+
+            .info-card {
+                background: var(--primary-bg);
+                border: 1px solid var(--primary-border);
+                border-radius: var(--radius-sm);
+                padding: 16px 20px;
+                margin-bottom: 24px;
+                font-size: 0.88rem;
+                color: var(--text);
+                line-height: 1.6;
+            }
+
+            .info-card strong {
+                color: var(--primary);
+            }
+
+            .info-card code {
+                font-family: var(--font-mono);
+                font-size: 0.82rem;
+                background: var(--bg-code);
+                padding: 2px 6px;
+                border-radius: 3px;
+            }
+
+            /* ============================================================
+       Step Cards
+       ============================================================ */
+            .step-card {
+                background: var(--bg-card);
+                border: 1px solid var(--border);
+                border-radius: var(--radius);
+                margin-bottom: 20px;
+                box-shadow: var(--shadow);
+                overflow: hidden;
+                transition: border-color var(--transition);
+            }
+
+            .step-card.completed {
+                border-color: var(--success);
+            }
+
+            .step-card.completed .step-header {
+                border-left: 3px solid var(--success);
+            }
+
+            .step-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 18px 24px;
+                cursor: pointer;
+                user-select: none;
+                transition: background var(--transition-fast);
+                border-left: 3px solid transparent;
+            }
+
+            .step-header:hover {
+                background: var(--bg-secondary);
+            }
+
+            .step-header-left {
+                display: flex;
+                align-items: center;
+                gap: 14px;
+                flex: 1;
+                min-width: 0;
+            }
+
+            .step-number {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                background: var(--primary-bg);
+                color: var(--primary);
+                font-size: 0.82rem;
+                font-weight: 700;
+                flex-shrink: 0;
+                transition: all var(--transition-fast);
+            }
+
+            .step-card.completed .step-number {
+                background: var(--success);
+                color: #fff;
+            }
+
+            .step-card.completed .step-number::after {
+                content: none;
+            }
+
+            .step-title-group {
+                min-width: 0;
+            }
+
+            .step-title {
+                font-size: 1.02rem;
+                font-weight: 600;
+                color: var(--text);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .step-desc {
+                font-size: 0.82rem;
+                color: var(--text-muted);
+                margin-top: 2px;
+            }
+
+            .step-header-right {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                flex-shrink: 0;
+            }
+
+            .step-time {
+                font-size: 0.75rem;
+                color: var(--text-muted);
+                font-weight: 500;
+                white-space: nowrap;
+            }
+
+            .chevron {
+                width: 20px;
+                height: 20px;
+                color: var(--text-muted);
+                transition: transform var(--transition);
+                flex-shrink: 0;
+            }
+
+            .step-card.expanded .chevron {
+                transform: rotate(180deg);
+            }
+
+            .step-body {
+                display: none;
+                padding: 0 24px 24px 24px;
+                border-top: 1px solid var(--border-light);
+            }
+
+            .step-card.expanded .step-body {
+                display: block;
+            }
+
+            .step-body > p,
+            .step-body > .step-section > p {
+                font-size: 0.92rem;
+                color: var(--text-secondary);
+                line-height: 1.7;
+                margin-top: 16px;
+            }
+
+            .step-body ol {
+                margin-top: 16px;
+                padding-left: 0;
+                counter-reset: step-counter;
+                list-style: none;
+            }
+
+            .step-body ol > li {
+                margin-bottom: 24px;
+                position: relative;
+            }
+
+            .step-body ol > li::before {
+                display: none;
+            }
+
+            .step-body ol > li > strong {
+                display: block;
+                font-size: 0.95rem;
+                color: var(--text);
+                margin-bottom: 8px;
+            }
+
+            .step-body ol > li > p,
+            .step-section p {
+                font-size: 0.9rem;
+                color: var(--text-secondary);
+                line-height: 1.7;
+                margin-bottom: 10px;
+            }
+
+            .step-section {
+                margin-top: 20px;
+            }
+
+            .step-section-title {
+                font-size: 0.95rem;
+                font-weight: 600;
+                color: var(--text);
+                margin-bottom: 10px;
+            }
+
+            /* ============================================================
+       Prompt Boxes
+       ============================================================ */
+            .prompt-box {
+                position: relative;
+                margin: 12px 0 16px;
+                background: var(--bg-code);
+                border: 1px solid var(--border-light);
+                border-radius: var(--radius-sm);
+                overflow: hidden;
+            }
+
+            .prompt-label {
+                display: inline-block;
+                padding: 4px 12px;
+                font-size: 0.68rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.08em;
+                color: var(--text-muted);
+                background: var(--border-light);
+                border-bottom-right-radius: var(--radius-sm);
+            }
+
+            .prompt-content {
+                padding: 14px 60px 14px 16px;
+                font-family: var(--font-mono);
+                font-size: 0.84rem;
+                line-height: 1.7;
+                color: var(--text);
+                white-space: pre-wrap;
+                word-break: break-word;
+            }
+
+            .copy-btn {
+                position: absolute;
+                top: 8px;
+                right: 8px;
+                background: var(--bg);
+                border: 1px solid var(--border);
+                border-radius: var(--radius-sm);
+                padding: 4px 10px;
+                font-size: 0.72rem;
+                color: var(--text-muted);
+                cursor: pointer;
+                transition: all var(--transition-fast);
+                font-family: var(--font-sans);
+            }
+
+            .copy-btn:hover {
+                border-color: var(--primary);
+                color: var(--primary);
+            }
+
+            .copy-btn.copied {
+                background: var(--success);
+                border-color: var(--success);
+                color: #fff;
+            }
+
+            /* ============================================================
+       Callout Boxes
+       ============================================================ */
+            .callout {
+                display: flex;
+                gap: 12px;
+                margin: 14px 0;
+                padding: 14px 16px;
+                background: var(--warning-bg);
+                border: 1px solid var(--warning-border);
+                border-radius: var(--radius-sm);
+                font-size: 0.87rem;
+                color: var(--text);
+                line-height: 1.6;
+            }
+
+            .callout-icon {
+                flex-shrink: 0;
+                width: 20px;
+                height: 20px;
+                margin-top: 1px;
+            }
+
+            .callout code {
+                font-family: var(--font-mono);
+                font-size: 0.8rem;
+                background: var(--bg-code);
+                padding: 1px 5px;
+                border-radius: 3px;
+            }
+
+            /* ============================================================
+       Hints (details/summary)
+       ============================================================ */
+            .hint {
+                margin: 14px 0;
+                border: 1px solid var(--border-light);
+                border-radius: var(--radius-sm);
+                overflow: hidden;
+            }
+
+            .hint summary {
+                padding: 10px 16px;
+                font-size: 0.86rem;
+                font-weight: 500;
+                color: var(--text-secondary);
+                cursor: pointer;
+                background: var(--bg-secondary);
+                transition: background var(--transition-fast);
+                list-style: none;
+            }
+
+            .hint summary::-webkit-details-marker {
+                display: none;
+            }
+
+            .hint summary::before {
+                content: "\25B6";
+                font-size: 0.65rem;
+                margin-right: 8px;
+                display: inline-block;
+                transition: transform var(--transition-fast);
+            }
+
+            .hint[open] summary::before {
+                transform: rotate(90deg);
+            }
+
+            .hint summary:hover {
+                background: var(--border-light);
+            }
+
+            .hint-content {
+                padding: 14px 16px;
+                font-size: 0.87rem;
+                color: var(--text-secondary);
+                line-height: 1.7;
+            }
+
+            .hint-content code {
+                font-family: var(--font-mono);
+                font-size: 0.8rem;
+                background: var(--bg-code);
+                padding: 1px 5px;
+                border-radius: 3px;
+            }
+
+            .hint-content ul {
+                list-style: disc;
+                padding-left: 20px;
+                margin-top: 6px;
+            }
+
+            .hint-content ul li {
+                margin-bottom: 4px;
+            }
+
+            /* ============================================================
+       Interactive Checklists
+       ============================================================ */
+            .checklist {
+                margin: 20px 0 8px;
+                list-style: none;
+                padding: 0;
+            }
+
+            .checklist li {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 10px 14px;
+                margin-bottom: 4px;
+                border-radius: var(--radius-sm);
+                font-size: 0.88rem;
+                color: var(--text-secondary);
+                cursor: pointer;
+                transition: background var(--transition-fast);
+                user-select: none;
+            }
+
+            .checklist li:hover {
+                background: var(--bg-secondary);
+            }
+
+            .checklist li::before {
+                content: "";
+                width: 18px;
+                height: 18px;
+                border: 2px solid var(--border);
+                border-radius: 4px;
+                flex-shrink: 0;
+                transition: all var(--transition-fast);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .checklist li.checked::before {
+                background: var(--success);
+                border-color: var(--success);
+                content: "";
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5L20 7'/%3E%3C/svg%3E");
+                background-size: 12px;
+                background-repeat: no-repeat;
+                background-position: center;
+            }
+
+            .checklist li.checked {
+                color: var(--success);
+                text-decoration: line-through;
+                text-decoration-color: var(--success-border);
+            }
+
+            /* ============================================================
+       Mark Complete Button
+       ============================================================ */
+            .complete-btn {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                margin-top: 20px;
+                padding: 10px 22px;
+                border: 1px solid var(--border);
+                border-radius: var(--radius-sm);
+                background: var(--bg);
+                color: var(--text);
+                font-size: 0.88rem;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all var(--transition-fast);
+                font-family: var(--font-sans);
+            }
+
+            .complete-btn:hover {
+                border-color: var(--success);
+                background: var(--success-bg);
+                color: var(--success);
+            }
+
+            .complete-btn.is-completed {
+                background: var(--success);
+                border-color: var(--success);
+                color: #fff;
+            }
+
+            .complete-btn.is-completed:hover {
+                background: var(--success-light);
+                border-color: var(--success-light);
+                color: #fff;
+            }
+
+            /* ============================================================
+       Bonus Grid
+       ============================================================ */
+            .bonus-section {
+                margin-top: 48px;
+            }
+
+            .bonus-section h2 {
+                font-size: 1.2rem;
+                font-weight: 700;
+                margin-bottom: 4px;
+            }
+
+            .bonus-section .subtitle {
+                font-size: 0.92rem;
+                color: var(--text-muted);
+                margin-bottom: 24px;
+            }
+
+            .bonus-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+                gap: 16px;
+            }
+
+            .bonus-card {
+                background: var(--bg-card);
+                border: 1px solid var(--bonus-border);
+                border-radius: var(--radius);
+                padding: 20px;
+                transition: all var(--transition);
+            }
+
+            .bonus-card:hover {
+                box-shadow: var(--shadow-md);
+                border-color: var(--bonus);
+                transform: translateY(-2px);
+            }
+
+            .bonus-card h3 {
+                font-size: 0.95rem;
+                font-weight: 600;
+                color: var(--bonus);
+                margin-bottom: 8px;
+            }
+
+            .bonus-card p {
+                font-size: 0.85rem;
+                color: var(--text-secondary);
+                line-height: 1.6;
+            }
+
+            /* ============================================================
+       Cheat Sheet Modal
+       ============================================================ */
+            .modal-overlay {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 1000;
+                align-items: center;
+                justify-content: center;
+                padding: 24px;
+            }
+
+            .modal-overlay.open {
+                display: flex;
+            }
+
+            .modal {
+                background: var(--bg-card);
+                border: 1px solid var(--border);
+                border-radius: var(--radius);
+                box-shadow: var(--shadow-lg);
+                max-width: 620px;
+                width: 100%;
+                max-height: 80vh;
+                overflow-y: auto;
+            }
+
+            .modal-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 20px 24px;
+                border-bottom: 1px solid var(--border-light);
+            }
+
+            .modal-header h2 {
+                font-size: 1.1rem;
+                font-weight: 700;
+            }
+
+            .modal-close {
+                background: none;
+                border: none;
+                font-size: 1.4rem;
+                color: var(--text-muted);
+                cursor: pointer;
+                padding: 4px;
+                line-height: 1;
+                transition: color var(--transition-fast);
+            }
+
+            .modal-close:hover {
+                color: var(--text);
+            }
+
+            .modal-body {
+                padding: 20px 24px 24px;
+            }
+
+            .cheat-table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            .cheat-table th {
+                text-align: left;
+                font-size: 0.75rem;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                color: var(--text-muted);
+                padding: 8px 12px;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .cheat-table td {
+                padding: 10px 12px;
+                font-size: 0.87rem;
+                border-bottom: 1px solid var(--border-light);
+            }
+
+            .cheat-table td:first-child {
+                font-family: var(--font-mono);
+                font-size: 0.82rem;
+                color: var(--primary);
+                white-space: nowrap;
+            }
+
+            .cheat-table td:last-child {
+                color: var(--text-secondary);
+            }
+
+            .modal-hint {
+                margin-top: 16px;
+                font-size: 0.8rem;
+                color: var(--text-muted);
+                text-align: center;
+            }
+
+            .modal-hint kbd {
+                display: inline-block;
+                padding: 2px 6px;
+                background: var(--bg-secondary);
+                border: 1px solid var(--border);
+                border-radius: 3px;
+                font-family: var(--font-mono);
+                font-size: 0.75rem;
+            }
+
+            /* ============================================================
+       Scroll-to-Top Button
+       ============================================================ */
+            .scroll-top {
+                display: none;
+                position: fixed;
+                bottom: 28px;
+                right: 28px;
+                width: 44px;
+                height: 44px;
+                border-radius: 50%;
+                background: var(--primary);
+                color: #fff;
+                border: none;
+                cursor: pointer;
+                box-shadow: var(--shadow-md);
+                align-items: center;
+                justify-content: center;
+                z-index: 50;
+                transition: all var(--transition-fast);
+            }
+
+            .scroll-top:hover {
+                background: var(--primary-dark);
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-lg);
+            }
+
+            .scroll-top.visible {
+                display: flex;
+            }
+
+            .scroll-top svg {
+                width: 20px;
+                height: 20px;
+            }
+
+            /* ============================================================
+       Inline code styling
+       ============================================================ */
+            .step-body
+                code:not(.prompt-content code):not(.callout code):not(
+                    .hint-content code
+                ):not(.info-card code) {
+                font-family: var(--font-mono);
+                font-size: 0.82rem;
+                background: var(--bg-code);
+                padding: 2px 6px;
+                border-radius: 3px;
+                color: var(--primary-dark);
+            }
+
+            @media (prefers-color-scheme: dark) {
+                .step-body
+                    code:not(.prompt-content code):not(.callout code):not(
+                        .hint-content code
+                    ):not(.info-card code) {
+                    color: var(--primary-light);
+                }
+            }
+
+            /* ============================================================
+       Responsive
+       ============================================================ */
+            @media (max-width: 640px) {
+                .header-inner {
+                    padding: 0 16px;
+                }
+
+                .header-title {
+                    font-size: 1.15rem;
+                }
+
+                .header-subtitle {
+                    display: none;
+                }
+
+                .container {
+                    padding: 20px 16px 60px;
+                }
+
+                .getting-started {
+                    padding: 20px;
+                }
+
+                .step-header {
+                    padding: 14px 16px;
+                }
+
+                .step-body {
+                    padding: 0 16px 20px;
+                }
+
+                .step-title {
+                    font-size: 0.92rem;
+                }
+
+                .step-time {
+                    display: none;
+                }
+
+                .prompt-content {
+                    font-size: 0.78rem;
+                    padding: 12px 50px 12px 14px;
+                }
+
+                .bonus-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            /* ============================================================
+       Selection & Focus
+       ============================================================ */
+            ::selection {
+                background: var(--primary);
+                color: #fff;
+            }
+
+            button:focus-visible,
+            summary:focus-visible {
+                outline: 2px solid var(--primary);
+                outline-offset: 2px;
+            }
+
+            /* ============================================================
+       Keyboard shortcut hint
+       ============================================================ */
+            .keyboard-hint {
+                position: fixed;
+                bottom: 28px;
+                left: 28px;
+                font-size: 0.75rem;
+                color: var(--text-muted);
+                z-index: 50;
+            }
+
+            .keyboard-hint kbd {
+                display: inline-block;
+                padding: 2px 7px;
+                background: var(--bg);
+                border: 1px solid var(--border);
+                border-radius: 4px;
+                font-family: var(--font-mono);
+                font-size: 0.72rem;
+                box-shadow: 0 1px 0 var(--border);
+            }
+
+            @media (max-width: 640px) {
+                .keyboard-hint {
+                    display: none;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <!-- ============================================================
+       Header
+       ============================================================ -->
+        <header class="header">
+            <div class="header-inner">
+                <div class="header-top">
+                    <div class="header-title-group">
+                        <h1 class="header-title">Claude Code Labs</h1>
+                        <span class="header-subtitle"
+                            >Build an Instagram Clone</span
+                        >
+                        <span class="badge">Workshop</span>
+                    </div>
+                    <button
+                        class="reset-btn"
+                        onclick="resetProgress()"
+                        aria-label="Reset progress"
+                    >
+                        Reset Progress
+                    </button>
+                </div>
+                <div class="progress-area">
+                    <div class="progress-bar-track">
+                        <div class="progress-bar-fill" id="progressFill"></div>
+                    </div>
+                    <span class="progress-text" id="progressText"
+                        >0 / 10 completed</span
+                    >
+                </div>
+            </div>
+        </header>
+
+        <!-- ============================================================
+       Main Content
+       ============================================================ -->
+        <main class="container">
+            <!-- Getting Started -->
+            <section class="getting-started">
+                <h2>Getting Started</h2>
+
+                <div class="prereq-grid">
+                    <div class="prereq-card">
+                        <h4>Prerequisites</h4>
+                        <ul>
+                            <li>Node.js 20+</li>
+                            <li>
+                                <a
+                                    href="https://bun.com/docs/installation"
+                                    target="_blank"
+                                    >bun</a
+                                >
+                                installed globally
+                            </li>
+                            <li>Git</li>
+                        </ul>
+                    </div>
+                    <div class="prereq-card">
+                        <h4>Tech Stack</h4>
+                        <div class="tech-stack-grid">
+                            <span class="tech-item">React 19</span>
+                            <span class="tech-item">Vite</span>
+                            <span class="tech-item">TanStack Router</span>
+                            <span class="tech-item">TanStack Query</span>
+                            <span class="tech-item">Tailwind CSS v4</span>
+                            <span class="tech-item">shadcn/ui</span>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Setup</h3>
+                <div class="prompt-box">
+                    <span class="prompt-label">Terminal</span>
+                    <button class="copy-btn" onclick="copyText(this)">
+                        Copy
+                    </button>
+                    <div class="prompt-content">git clone https://github.com/zartis-digital/instagram-clone-starter
+cd instagram-clone
+bun install</div>
+                </div>
+
+                <h3>Environment Variables</h3>
+                <p>
+                    Create a <code>.env</code> file in the project root to
+                    point the frontend at the production API:
+                </p>
+                <div class="prompt-box">
+                    <span class="prompt-label">.env</span>
+                    <button class="copy-btn" onclick="copyText(this)">
+                        Copy
+                    </button>
+                    <div class="prompt-content">VITE_API_URL=https://fqg27fj0idic0tmq91ssdh20.178.105.11.199.sslip.io
+VITE_WS_URL=wss://fqg27fj0idic0tmq91ssdh20.178.105.11.199.sslip.io
+VITE_STORAGE_PUBLIC_URL=https://minio-api-kqf7qd.178.105.11.199.sslip.io/instagram-uploads</div>
+                </div>
+
+                <p>Then start the dev server:</p>
+                <div class="prompt-box">
+                    <span class="prompt-label">Terminal</span>
+                    <button class="copy-btn" onclick="copyText(this)">
+                        Copy
+                    </button>
+                    <div class="prompt-content">bun dev</div>
+                </div>
+                <p>
+                    App runs at <code>http://localhost:3000</code>. Launch
+                    Claude Code with <code>claude</code> in the project root.
+                </p>
+
+                <h3>Project Structure</h3>
+                <div class="project-structure">src/
+  routes/      &#8592; File-based routing (TanStack Router)
+  components/  &#8592; React components
+  queries/     &#8592; TanStack Query hooks
+  lib/         &#8592; API client, utilities
+  hooks/       &#8592; Custom React hooks</div>
+
+                <h3>Key Files</h3>
+                <p>
+                    Routes are in <code>src/routes/</code>, queries in
+                    <code>src/queries/</code>, and the API client helper is at
+                    <code>src/lib/api.ts</code>.
+                </p>
+
+                <div class="important-note">
+                    <strong>Important:</strong> The backend API is already
+                    deployed. You only work on the frontend. API docs are
+                    available at
+                    <code
+                        >https://fqg27fj0idic0tmq91ssdh20.178.105.11.199.sslip.io/swagger</code
+                    >.
+                </div>
+            </section>
+
+            <!-- ============================================================
+         PART 1
+         ============================================================ -->
+            <div class="part-header">
+                <h2>Part 1: Setting Up Claude Code</h2>
+                <p>
+                    Get familiar with Claude Code, configure your project
+                    context, and learn the key workflows. (~60 min)
+                </p>
+            </div>
+
+            <!-- Step 1 -->
+            <article class="step-card" data-feature="1">
+                <div
+                    class="step-header"
+                    onclick="toggleCard(this.parentElement)"
+                >
+                    <div class="step-header-left">
+                        <span class="step-number">1</span>
+                        <div class="step-title-group">
+                            <div class="step-title">
+                                Foundation &mdash; Install &amp; First Commands
+                            </div>
+                            <div class="step-desc">
+                                Get Claude Code running and explore the project
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-header-right">
+                        <span class="step-time">~10 min</span>
+                        <svg
+                            class="chevron"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="M6 9l6 6 6-6" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="step-body">
+                    <ol>
+                        <li>
+                            <strong>Launch Claude Code</strong>
+                            <div class="prompt-box">
+                                <span class="prompt-label">Terminal</span>
+                                <button
+                                    class="copy-btn"
+                                    onclick="copyText(this)"
+                                >
+                                    Copy
+                                </button>
+                                <div class="prompt-content">cd instagram-clone claude</div>
+                            </div>
+                        </li>
+                        <li>
+                            <strong>Set the model</strong> &mdash; Make sure
+                            you're using the best model:
+                            <div class="prompt-box">
+                                <span class="prompt-label">Claude Code</span>
+                                <button
+                                    class="copy-btn"
+                                    onclick="copyText(this)"
+                                >
+                                    Copy
+                                </button>
+                                <div class="prompt-content">/model</div>
+                            </div>
+                            <div class="callout">
+                                <svg
+                                    class="callout-icon"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <path
+                                        d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"
+                                    />
+                                    <line x1="9" y1="21" x2="15" y2="21" />
+                                </svg>
+                                <span
+                                    >Select <code>claude-sonnet-4-6</code> for
+                                    fast responses, or
+                                    <code>claude-opus-4-6</code> for maximum
+                                    quality.</span
+                                >
+                            </div>
+                        </li>
+                        <li>
+                            <strong>Initialize the project</strong> &mdash; Let
+                            Claude understand the codebase:
+                            <div class="prompt-box">
+                                <span class="prompt-label">Claude Code</span>
+                                <button
+                                    class="copy-btn"
+                                    onclick="copyText(this)"
+                                >
+                                    Copy
+                                </button>
+                                <div class="prompt-content">/init</div>
+                            </div>
+                            <div class="callout">
+                                <svg
+                                    class="callout-icon"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <path
+                                        d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"
+                                    />
+                                    <line x1="9" y1="21" x2="15" y2="21" />
+                                </svg>
+                                <span
+                                    >This creates a CLAUDE.md file with project
+                                    context. Claude will explore your codebase
+                                    and write a summary of the architecture,
+                                    commands, and patterns.</span
+                                >
+                            </div>
+                        </li>
+                        <li>
+                            <strong>First conversation</strong> &mdash; Ask
+                            Claude about the project:
+                            <div class="prompt-box">
+                                <span class="prompt-label">Prompt</span>
+                                <button
+                                    class="copy-btn"
+                                    onclick="copyText(this)"
+                                >
+                                    Copy
+                                </button>
+                                <div class="prompt-content">Explain the architecture of this project. What are the main directories, key files, and how does the data flow from components to the API?</div>
+                            </div>
+                        </li>
+                    </ol>
+
+                    <details class="hint">
+                        <summary>Stuck? Click for help</summary>
+                        <div class="hint-content">
+                            If Claude seems confused about the project
+                            structure, make sure you launched
+                            <code>claude</code> from the project root directory
+                            (where <code>package.json</code> is).
+                        </div>
+                    </details>
+
+                    <ul class="checklist">
+                        <li onclick="toggleCheck(this)">
+                            Claude Code is installed and authenticated
+                        </li>
+                        <li onclick="toggleCheck(this)">
+                            Running <code>claude</code> opens the CLI interface
+                        </li>
+                        <li onclick="toggleCheck(this)">
+                            <code>/init</code> generated or updated CLAUDE.md
+                        </li>
+                        <li onclick="toggleCheck(this)">
+                            Claude can explain the project architecture
+                        </li>
+                    </ul>
+
+                    <button class="complete-btn" onclick="toggleComplete(this)">
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="M5 12l5 5L20 7" />
+                        </svg>
+                        Mark as Completed
+                    </button>
+                </div>
+            </article>
+
+            <!-- Step 2 -->
+            <article class="step-card" data-feature="2">
+                <div
+                    class="step-header"
+                    onclick="toggleCard(this.parentElement)"
+                >
+                    <div class="step-header-left">
+                        <span class="step-number">2</span>
+                        <div class="step-title-group">
+                            <div class="step-title">
+                                CLAUDE.md &mdash; Teaching Claude About Your
+                                Project
+                            </div>
+                            <div class="step-desc">
+                                Give Claude persistent context about your
+                                codebase
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-header-right">
+                        <span class="step-time">~10 min</span>
+                        <svg
+                            class="chevron"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="M6 9l6 6 6-6" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="step-body">
+                    <ol>
+                        <li>
+                            <strong>Read the existing CLAUDE.md</strong>
+                            <div class="prompt-box">
+                                <span class="prompt-label">Claude Code</span>
+                                <button
+                                    class="copy-btn"
+                                    onclick="copyText(this)"
+                                >
+                                    Copy
+                                </button>
+                                <div class="prompt-content">Read the CLAUDE.md file and explain what each section does</div>
+                            </div>
+                            <p>
+                                CLAUDE.md is like a README for Claude. It's
+                                loaded at the start of every conversation,
+                                giving Claude persistent context about your
+                                project's architecture, commands, and patterns.
+                            </p>
+                        </li>
+                        <li>
+                            <strong>Key sections to notice</strong>
+                            <p>
+                                <code>## Commands</code> &mdash; How to run,
+                                build, test the project.<br />
+                                <code>## Architecture</code> &mdash; Apps,
+                                packages, and how they connect.<br />
+                                <code>### Key Patterns</code> &mdash; Important
+                                conventions (TanStack Router, TanStack Query,
+                                API client, etc.)
+                            </p>
+                        </li>
+                        <li>
+                            <strong>Scoped rules</strong> &mdash; Check the
+                            <code>.claude/rules/</code> directory:
+                            <div class="prompt-box">
+                                <span class="prompt-label">Claude Code</span>
+                                <button
+                                    class="copy-btn"
+                                    onclick="copyText(this)"
+                                >
+                                    Copy
+                                </button>
+                                <div class="prompt-content">Read .claude/rules/api-routes.md — what conventions does it enforce?</div>
+                            </div>
+                            <div class="callout">
+                                <svg
+                                    class="callout-icon"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <path
+                                        d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"
+                                    />
+                                    <line x1="9" y1="21" x2="15" y2="21" />
+                                </svg>
+                                <span
+                                    >Rules in
+                                    <code>.claude/rules/</code> provide scoped
+                                    instructions. They're automatically loaded
+                                    when Claude works on related files. This is
+                                    great for enforcing patterns like "always
+                                    use OpenAPI validation on API routes".</span
+                                >
+                            </div>
+                        </li>
+                        <li>
+                            <strong>Add a custom instruction</strong> &mdash;
+                            Teach Claude something specific:
+                            <div class="prompt-box">
+                                <span class="prompt-label">Prompt</span>
+                                <button
+                                    class="copy-btn"
+                                    onclick="copyText(this)"
+                                >
+                                    Copy
+                                </button>
+                                <div class="prompt-content">Add this instruction to CLAUDE.md under a new "## Frontend Conventions" section: "Always use TanStack Query hooks from src/queries/ for data fetching. Never use raw fetch() in components. Use the api helper from src/lib/api.ts for all API calls."</div>
+                            </div>
+                        </li>
+                    </ol>
+
+                    <details class="hint">
+                        <summary>Stuck? Click for help</summary>
+                        <div class="hint-content">
+                            CLAUDE.md is checked into your repo, so your whole
+                            team benefits from the context. Think of it as your
+                            team's shared knowledge about the project, written
+                            for an AI collaborator.
+                        </div>
+                    </details>
+
+                    <ul class="checklist">
+                        <li onclick="toggleCheck(this)">
+                            Understand what CLAUDE.md does and why it matters
+                        </li>
+                        <li onclick="toggleCheck(this)">
+                            Know about <code>.claude/rules/</code> for scoped
+                            instructions
+                        </li>
+                        <li onclick="toggleCheck(this)">
+                            Added a custom instruction to CLAUDE.md
+                        </li>
+                    </ul>
+
+                    <button class="complete-btn" onclick="toggleComplete(this)">
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="M5 12l5 5L20 7" />
+                        </svg>
+                        Mark as Completed
+                    </button>
+                </div>
+            </article>
+
+            <!-- Step 3 -->
+            <article class="step-card" data-feature="3">
+                <div
+                    class="step-header"
+                    onclick="toggleCard(this.parentElement)"
+                >
+                    <div class="step-header-left">
+                        <span class="step-number">3</span>
+                        <div class="step-title-group">
+                            <div class="step-title">
+                                MCP Configuration &mdash; Supercharging Claude
+                            </div>
+                            <div class="step-desc">
+                                Connect Claude to external tools for browser
+                                testing and documentation
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-header-right">
+                        <span class="step-time">~15 min</span>
+                        <svg
+                            class="chevron"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="M6 9l6 6 6-6" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="step-body">
+                    <ol>
+                        <li>
+                            <strong>What are MCP servers?</strong>
+                            <p>
+                                MCP (Model Context Protocol) servers give Claude
+                                access to external tools &mdash; like a browser,
+                                documentation databases, or APIs. Think of them
+                                as plugins that extend what Claude can do beyond
+                                just reading and writing code.
+                            </p>
+                        </li>
+                        <li>
+                            <strong>Create .mcp.json</strong> &mdash; Configure
+                            two essential MCP servers:
+                            <div class="prompt-box">
+                                <span class="prompt-label">Prompt</span>
+                                <button
+                                    class="copy-btn"
+                                    onclick="copyText(this)"
+                                >
+                                    Copy
+                                </button>
+                                <div class="prompt-content">Add MCP servers for Playwright (browser automation) and Context7 (library documentation). Create the .mcp.json file in the project root.</div>
+                            </div>
+                            <p>Or create it manually:</p>
+                            <div class="prompt-box">
+                                <span class="prompt-label"
+                                    >Filename: .mcp.json</span
+                                >
+                                <button
+                                    class="copy-btn"
+                                    onclick="copyText(this)"
+                                >
+                                    Copy
+                                </button>
+                                <div class="prompt-content">{
+  "mcpServers": {
+    "playwright": { "command": "npx", "args": ["@playwright/mcp@latest"] },
+    "context7": { "command": "npx", "args": ["-y", "@upstash/context7-mcp@latest"] }
+  }
+}</div>
+                            </div>
+                        </li>
+                        <li>
+                            <strong>Test Playwright</strong> &mdash; Let Claude
+                            see your app:
+                            <div class="prompt-box">
+                                <span class="prompt-label">Prompt</span>
+                                <button
+                                    class="copy-btn"
+                                    onclick="copyText(this)"
+                                >
+                                    Copy
+                                </button>
+                                <div class="prompt-content">Open http://localhost:3000 in the browser and take a screenshot. Describe what you see.</div>
+                            </div>
+                            <div class="callout">
+                                <svg
+                                    class="callout-icon"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <path
+                                        d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"
+                                    />
+                                    <line x1="9" y1="21" x2="15" y2="21" />
+                                </svg>
+                                <span
+                                    >Playwright MCP lets Claude navigate your
+                                    app, click buttons, fill forms, and take
+                                    screenshots. It's incredibly powerful for
+                                    testing and debugging UI issues.</span
+                                >
+                            </div>
+                        </li>
+                        <li>
+                            <strong>Test Context7</strong> &mdash; Look up
+                            documentation:
+                            <div class="prompt-box">
+                                <span class="prompt-label">Prompt</span>
+                                <button
+                                    class="copy-btn"
+                                    onclick="copyText(this)"
+                                >
+                                    Copy
+                                </button>
+                                <div class="prompt-content">Use context7 to look up how useMutation works in TanStack Query. Show me an example of optimistic updates.</div>
+                            </div>
+                            <div class="callout">
+                                <svg
+                                    class="callout-icon"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <path
+                                        d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"
+                                    />
+                                    <line x1="9" y1="21" x2="15" y2="21" />
+                                </svg>
+                                <span
+                                    >Context7 gives Claude access to up-to-date
+                                    documentation for libraries. No more
+                                    hallucinated APIs &mdash; Claude can check
+                                    the actual docs.</span
+                                >
+                            </div>
+                        </li>
+                    </ol>
+
+                    <details class="hint">
+                        <summary>Stuck? Click for help</summary>
+                        <div class="hint-content">
+                            If MCP servers fail to connect, try restarting
+                            Claude Code. MCP servers are started when Claude
+                            launches and sometimes need a fresh start.
+                        </div>
+                    </details>
+
+                    <ul class="checklist">
+                        <li onclick="toggleCheck(this)">
+                            <code>.mcp.json</code> file created with Playwright
+                            and Context7
+                        </li>
+                        <li onclick="toggleCheck(this)">
+                            Claude can take screenshots of the running app
+                        </li>
+                        <li onclick="toggleCheck(this)">
+                            Claude can look up library documentation
+                        </li>
+                    </ul>
+
+                    <button class="complete-btn" onclick="toggleComplete(this)">
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="M5 12l5 5L20 7" />
+                        </svg>
+                        Mark as Completed
+                    </button>
+                </div>
+            </article>
+
+            <!-- Step 4 -->
+            <article class="step-card" data-feature="4">
+                <div
+                    class="step-header"
+                    onclick="toggleCard(this.parentElement)"
+                >
+                    <div class="step-header-left">
+                        <span class="step-number">4</span>
+                        <div class="step-title-group">
+                            <div class="step-title">
+                                Plan Mode &mdash; Think Before You Code
+                            </div>
+                            <div class="step-desc">
+                                Use Plan Mode to design your approach before
+                                writing code
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-header-right">
+                        <span class="step-time">~10 min</span>
+                        <svg
+                            class="chevron"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="M6 9l6 6 6-6" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="step-body">
+                    <ol>
+                        <li>
+                            <strong>Enter Plan Mode</strong>
+                            <div class="prompt-box">
+                                <span class="prompt-label">Claude Code</span>
+                                <button
+                                    class="copy-btn"
+                                    onclick="copyText(this)"
+                                >
+                                    Copy
+                                </button>
+                                <div class="prompt-content">/plan</div>
+                            </div>
+                            <p>
+                                Plan Mode tells Claude to research and design an
+                                approach WITHOUT making any changes. It explores
+                                the codebase, reads relevant files, and proposes
+                                a step-by-step implementation plan. You review
+                                the plan and only then approve it for execution.
+                            </p>
+                            <div class="callout">
+                                <svg
+                                    class="callout-icon"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <path
+                                        d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"
+                                    />
+                                    <line x1="9" y1="21" x2="15" y2="21" />
+                                </svg>
+                                <span
+                                    >You can also toggle Plan Mode with
+                                    <code>Shift+Tab</code>. Use it whenever a
+                                    feature touches 3+ files or involves complex
+                                    logic.</span
+                                >
+                            </div>
+                        </li>
+                        <li>
+                            <strong>Plan your first feature</strong> &mdash;
+                            Let's plan the Create Post feature:
+                            <div class="prompt-box">
+                                <span class="prompt-label"
+                                    >Prompt (in plan mode)</span
+                                >
+                                <button
+                                    class="copy-btn"
+                                    onclick="copyText(this)"
+                                >
+                                    Copy
+                                </button>
+                                <div class="prompt-content">I need to implement the Create Post feature. The create post dialog exists but the upload logic, image preview, caption input, and submit handler are missing (marked with TODOs). Plan how to implement this. Check the API swagger docs for the POST /posts endpoint and the upload flow.</div>
+                            </div>
+                        </li>
+                        <li>
+                            <strong>Review the plan</strong> &mdash; Claude will
+                            propose:
+                            <p>
+                                Which files to modify, what components/hooks to
+                                create, the data flow (upload &rarr; get URL
+                                &rarr; create post), and edge cases to handle.
+                                Ask questions, request changes, or approve when
+                                satisfied.
+                            </p>
+                        </li>
+                        <li>
+                            <strong>Exit Plan Mode</strong> &mdash; When you're
+                            happy with the plan:
+                            <div class="prompt-box">
+                                <span class="prompt-label">Claude Code</span>
+                                <button
+                                    class="copy-btn"
+                                    onclick="copyText(this)"
+                                >
+                                    Copy
+                                </button>
+                                <div class="prompt-content">/plan</div>
+                            </div>
+                            <div class="callout">
+                                <svg
+                                    class="callout-icon"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <path
+                                        d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"
+                                    />
+                                    <line x1="9" y1="21" x2="15" y2="21" />
+                                </svg>
+                                <span
+                                    >Toggle <code>/plan</code> again to exit.
+                                    Now Claude will execute the plan and make
+                                    the actual code changes.</span
+                                >
+                            </div>
+                        </li>
+                    </ol>
+
+                    <details class="hint">
+                        <summary>Stuck? Click for help</summary>
+                        <div class="hint-content">
+                            Plan Mode is especially valuable when you're
+                            unfamiliar with a codebase. It lets Claude do the
+                            research for you and propose an approach you can
+                            review before any code is written.
+                        </div>
+                    </details>
+
+                    <ul class="checklist">
+                        <li onclick="toggleCheck(this)">
+                            Can enter and exit Plan Mode
+                        </li>
+                        <li onclick="toggleCheck(this)">
+                            Claude created a plan for the Create Post feature
+                        </li>
+                        <li onclick="toggleCheck(this)">
+                            Understand when to use Plan Mode (complex,
+                            multi-file features)
+                        </li>
+                    </ul>
+
+                    <button class="complete-btn" onclick="toggleComplete(this)">
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="M5 12l5 5L20 7" />
+                        </svg>
+                        Mark as Completed
+                    </button>
+                </div>
+            </article>
+
+            <!-- ============================================================
+         PART 2
+         ============================================================ -->
+            <div class="part-header">
+                <h2>Part 2: Building the Orchestration Layer</h2>
+                <p>
+                    Build a team of specialized AI agents that collaborate to
+                    deliver software. A product agent defines requirements,
+                    skills persist and flesh out issues, and developer and QA
+                    agents implement and verify. (~30 min)
+                </p>
+            </div>
+
+            <!-- Step 5 -->
+            <article class="step-card" data-feature="5">
+                <div
+                    class="step-header"
+                    onclick="toggleCard(this.parentElement)"
+                >
+                    <div class="step-header-left">
+                        <span class="step-number">5</span>
+                        <div class="step-title-group">
+                            <div class="step-title">Product Agent</div>
+                            <div class="step-desc">
+                                A product manager agent that defines
+                                requirements and creates issues
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-header-right">
+                        <span class="step-time">~10 min</span>
+                        <svg
+                            class="chevron"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="M6 9l6 6 6-6" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="step-body">
+                    <p>
+                        <strong>Agents</strong> are specialized personas that
+                        Claude can adopt. Each agent is a markdown file in
+                        <code>.claude/agents/</code> with a system prompt that
+                        defines its role, expertise, and behavior. Claude
+                        automatically discovers them &mdash; you can ask Claude
+                        to use one or it may choose the right agent on its own.
+                    </p>
+                    <p>
+                        The <strong>product manager agent</strong> is responsible
+                        for turning vague feature ideas into structured,
+                        actionable issues that the developer agent can pick up
+                        and implement.
+                    </p>
+
+                    <div class="prompt-box">
+                        <span class="prompt-label">Prompt</span>
+                        <button class="copy-btn" onclick="copyText(this)">
+                            Copy
+                        </button>
+                        <div class="prompt-content">Create a product manager agent at .claude/agents/product-manager.md. It should: - Act as a senior product manager with strong domain knowledge - Write user stories in the format: "As a [user], I want [goal] so that [benefit]" - Break features into small, focused issues and save them to docs/issues/ using the /create-issue skill - Think about edge cases, error states, and out-of-scope items - Reference the Swagger API docs to understand what's possible - Never write code — only define requirements and specs</div>
+                    </div>
+
+                    <div class="callout">
+                        <svg
+                            class="callout-icon"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path
+                                d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"
+                            />
+                            <line x1="9" y1="21" x2="15" y2="21" />
+                        </svg>
+                        <span
+                            >Claude automatically discovers agents in
+                            <code>.claude/agents/</code>. You can ask Claude to
+                            "use the product manager agent" or it may select it
+                            automatically based on your request.</span
+                        >
+                    </div>
+
+                    <ul class="checklist">
+                        <li onclick="toggleCheck(this)">
+                            Created <code>.claude/agents/product-manager.md</code>
+                        </li>
+                        <li onclick="toggleCheck(this)">
+                            Understand what the agent produces (user stories,
+                            specs, issues)
+                        </li>
+                    </ul>
+
+                    <button class="complete-btn" onclick="toggleComplete(this)">
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="M5 12l5 5L20 7" />
+                        </svg>
+                        Mark as Completed
+                    </button>
+                </div>
+            </article>
+
+            <!-- Step 6 -->
+            <article class="step-card" data-feature="6">
+                <div
+                    class="step-header"
+                    onclick="toggleCard(this.parentElement)"
+                >
+                    <div class="step-header-left">
+                        <span class="step-number">6</span>
+                        <div class="step-title-group">
+                            <div class="step-title">Create Issue Skill</div>
+                            <div class="step-desc">
+                                A /create-issue slash command that saves issues
+                                to docs/issues/
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-header-right">
+                        <span class="step-time">~5 min</span>
+                        <svg
+                            class="chevron"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="M6 9l6 6 6-6" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="step-body">
+                    <p>
+                        <strong>Skills</strong> are custom slash skills
+                        defined in <code>.claude/skills/</code> that automate
+                        repeatable workflows. The
+                        <code>/create-issue</code> skill gives the product
+                        manager (and any other agent) a standard way to persist
+                        requirements as markdown files that the developer agent
+                        can later pick up.
+                    </p>
+
+                    <div class="prompt-box">
+                        <span class="prompt-label">Prompt</span>
+                        <button class="copy-btn" onclick="copyText(this)">
+                            Copy
+                        </button>
+                        <div class="prompt-content">Create a skill at .claude/skills/create-issue.md with this frontmatter and content:
+
+---
+description: Create a new issue markdown file in docs/issues/. Use when a feature, bug, or task needs to be tracked as a work item.
+argument-hint: [title] [description]
+allowed-tools: Write Bash(mkdir *)
+disable-model-invocation: true
+---
+
+When invoked with /create-issue: 1. Accept a title and short description as input 2. Generate a URL-friendly slug from the title (lowercase, hyphens, no special chars) 3. Create a markdown file at docs/issues/&lt;slug&gt;.md with these fields: title, description, acceptance criteria, priority (low/medium/high), status: open 4. Create the docs/issues/ directory if it doesn't exist 5. Print the path of the created file</div>
+                    </div>
+
+                    <div class="callout">
+                        <svg
+                            class="callout-icon"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path
+                                d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"
+                            />
+                            <line x1="9" y1="21" x2="15" y2="21" />
+                        </svg>
+                        <span
+                            >Skills run as slash skills in the current
+                            conversation context. Any agent can invoke
+                            <code>/create-issue</code> directly, making it a
+                            shared contract between the product manager,
+                            developer, and QA agents.</span
+                        >
+                    </div>
+
+                    <ul class="checklist">
+                        <li onclick="toggleCheck(this)">
+                            Created <code>.claude/skills/create-issue.md</code>
+                        </li>
+                        <li onclick="toggleCheck(this)">
+                            Tested <code>/create-issue</code> manually and saw
+                            the file appear in <code>docs/issues/</code>
+                        </li>
+                    </ul>
+
+                    <button class="complete-btn" onclick="toggleComplete(this)">
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="M5 12l5 5L20 7" />
+                        </svg>
+                        Mark as Completed
+                    </button>
+                </div>
+            </article>
+
+            <!-- Step 7 -->
+            <article class="step-card" data-feature="7">
+                <div
+                    class="step-header"
+                    onclick="toggleCard(this.parentElement)"
+                >
+                    <div class="step-header-left">
+                        <span class="step-number">7</span>
+                        <div class="step-title-group">
+                            <div class="step-title">
+                                Interview Requirements Skill
+                            </div>
+                            <div class="step-desc">
+                                A /interview-requirements skill that fleshes out
+                                feature details before filing an issue
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-header-right">
+                        <span class="step-time">~10 min</span>
+                        <svg
+                            class="chevron"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="M6 9l6 6 6-6" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="step-body">
+                    <p>
+                        Writing good requirements is a dialogue, not a
+                        monologue. This skill combines the product manager
+                        agent's expertise with interactive questioning to ensure
+                        every issue is well-defined before any code is written.
+                    </p>
+
+                    <div class="prompt-box">
+                        <span class="prompt-label">Prompt</span>
+                        <button class="copy-btn" onclick="copyText(this)">
+                            Copy
+                        </button>
+                        <div class="prompt-content">Create a skill at .claude/skills/interview-requirements.md with this frontmatter and content:
+
+---
+description: Interview the user to flesh out requirements for a feature before filing an issue. Adopt the product manager agent persona and ask 3-5 targeted questions.
+argument-hint: &lt;feature&gt;
+context: fork
+agent: product-manager
+---
+
+When invoked with /interview-requirements &lt;feature&gt;: 1. Adopt the product manager agent persona 2. Ask the user 3-5 targeted questions using the AskUserTool to clarify: scope, target users, edge cases, acceptance criteria, and priority 3. Synthesize the answers into a structured feature spec with: user story, acceptance criteria, edge cases, and out-of-scope items 4. Present the spec clearly 5. Ask the user if they want to invoke /create-issue to save the spec to docs/issues/</div>
+                    </div>
+
+                    <div class="callout">
+                        <svg
+                            class="callout-icon"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path
+                                d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"
+                            />
+                            <line x1="9" y1="21" x2="15" y2="21" />
+                        </svg>
+                        <span
+                            >This skill combines a specialized agent persona
+                            with interactive questioning &mdash; a powerful
+                            pattern for ensuring requirements are clear before
+                            any code is written. The
+                            <code>AskUserTool</code> lets Claude present
+                            structured choices to gather precise
+                            answers.</span
+                        >
+                    </div>
+
+                    <ul class="checklist">
+                        <li onclick="toggleCheck(this)">
+                            Created
+                            <code>.claude/skills/interview-requirements.md</code>
+                        </li>
+                        <li onclick="toggleCheck(this)">
+                            Ran <code>/interview-requirements</code> on a sample
+                            feature and confirmed the spec output
+                        </li>
+                        <li onclick="toggleCheck(this)">
+                            Persisted the issue via <code>/create-issue</code>
+                        </li>
+                    </ul>
+
+                    <button class="complete-btn" onclick="toggleComplete(this)">
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="M5 12l5 5L20 7" />
+                        </svg>
+                        Mark as Completed
+                    </button>
+                </div>
+            </article>
+
+            <!-- Step 8 -->
+            <article class="step-card" data-feature="8">
+                <div
+                    class="step-header"
+                    onclick="toggleCard(this.parentElement)"
+                >
+                    <div class="step-header-left">
+                        <span class="step-number">8</span>
+                        <div class="step-title-group">
+                            <div class="step-title">Developer Agent</div>
+                            <div class="step-desc">
+                                A senior frontend developer agent that
+                                implements issues
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-header-right">
+                        <span class="step-time">~5 min</span>
+                        <svg
+                            class="chevron"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="M6 9l6 6 6-6" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="step-body">
+                    <p>
+                        The developer agent picks up issues from
+                        <code>docs/issues/</code> and implements them following
+                        the project's conventions. It knows which libraries to
+                        use, where to look for API specs, and how to keep the
+                        code minimal and correct.
+                    </p>
+
+                    <div class="prompt-box">
+                        <span class="prompt-label">Prompt</span>
+                        <button class="copy-btn" onclick="copyText(this)">
+                            Copy
+                        </button>
+                        <div class="prompt-content">Create a developer agent at .claude/agents/developer.md. It should be a senior frontend developer that: - Picks up issues from docs/issues/ and implements them - Uses TanStack Query for data fetching and TanStack Router for navigation - Always uses the api helper from src/lib/api.ts, never raw fetch() - Writes clean, minimal code — no over-engineering - Checks the Swagger API docs before implementing any API call - Uses optimistic updates for mutations that affect the UI - Updates the issue status to "done" in docs/issues/ when the feature is complete</div>
+                    </div>
+
+                    <ul class="checklist">
+                        <li onclick="toggleCheck(this)">
+                            Created <code>.claude/agents/developer.md</code>
+                        </li>
+                    </ul>
+
+                    <button class="complete-btn" onclick="toggleComplete(this)">
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="M5 12l5 5L20 7" />
+                        </svg>
+                        Mark as Completed
+                    </button>
+                </div>
+            </article>
+
+            <!-- Step 9 -->
+            <article class="step-card" data-feature="9">
+                <div
+                    class="step-header"
+                    onclick="toggleCard(this.parentElement)"
+                >
+                    <div class="step-header-left">
+                        <span class="step-number">9</span>
+                        <div class="step-title-group">
+                            <div class="step-title">QA Agent</div>
+                            <div class="step-desc">
+                                A testing agent that verifies features and
+                                reports bugs
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-header-right">
+                        <span class="step-time">~5 min</span>
+                        <svg
+                            class="chevron"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="M6 9l6 6 6-6" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="step-body">
+                    <p>
+                        The QA agent closes the loop: it tests implemented
+                        features using Playwright MCP, checks both happy path
+                        and error states, and files bug reports as new issues
+                        for the developer agent to fix.
+                    </p>
+
+                    <div class="prompt-box">
+                        <span class="prompt-label">Prompt</span>
+                        <button class="copy-btn" onclick="copyText(this)">
+                            Copy
+                        </button>
+                        <div class="prompt-content">Create a QA agent at .claude/agents/qa.md. It should: - Test features by navigating the app with Playwright MCP (take screenshots, click buttons, fill forms) - Check both happy path and error states - Verify responsive behavior at mobile and desktop widths - Report bugs by creating a new issue via /create-issue with: steps to reproduce, expected vs actual behavior, and a screenshot path - Never fix bugs — only report them clearly for the developer agent to fix</div>
+                    </div>
+
+                    <p>
+                        <strong>Try the full workflow:</strong>
+                    </p>
+
+                    <div class="prompt-box">
+                        <span class="prompt-label">Prompt</span>
+                        <button class="copy-btn" onclick="copyText(this)">
+                            Copy
+                        </button>
+                        <div class="prompt-content">Run /interview-requirements 'double-tap to like on feed posts' to spec the feature. Then switch to the developer agent to implement it. Finally use the QA agent to test it and report any issues.</div>
+                    </div>
+
+                    <details class="hint">
+                        <summary>Agent vs Skill — when to use which?</summary>
+                        <div class="hint-content">
+                            <strong>Agents</strong> change Claude's persona for
+                            the conversation &mdash; use them when you want
+                            Claude to think and behave differently (e.g., as a
+                            QA tester vs a developer).
+                            <strong>Skills</strong> are one-shot automations that
+                            run a specific workflow &mdash; use them for
+                            repeatable tasks like gathering requirements,
+                            creating issues, or committing.
+                        </div>
+                    </details>
+
+                    <ul class="checklist">
+                        <li onclick="toggleCheck(this)">
+                            Created <code>.claude/agents/qa.md</code>
+                        </li>
+                        <li onclick="toggleCheck(this)">
+                            Ran the full interview &rarr; create-issue &rarr;
+                            developer &rarr; QA workflow
+                        </li>
+                    </ul>
+
+                    <button class="complete-btn" onclick="toggleComplete(this)">
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="M5 12l5 5L20 7" />
+                        </svg>
+                        Mark as Completed
+                    </button>
+                </div>
+            </article>
+
+            <!-- ============================================================
+         PART 3
+         ============================================================ -->
+            <div class="part-header">
+                <h2>Part 3: Building Features</h2>
+                <p>
+                    Now it's time to build! The backend API is running and fully
+                    functional. Your frontend has auth, layout, and routing
+                    working &mdash; but key interactive features need to be
+                    implemented. Use the orchestration layer you just built to
+                    bring this Instagram clone to life. (~60 min)
+                </p>
+            </div>
+
+            <div class="info-card">
+                <strong>API Documentation:</strong> The Swagger docs at
+                <code>https://fqg27fj0idic0tmq91ssdh20.178.105.11.199.sslip.io/swagger</code>
+                are your best friend. When implementing a feature, tell Claude
+                to check the Swagger docs for the relevant endpoints. This gives
+                it the exact request/response shapes.
+            </div>
+
+            <!-- Step 10 -->
+            <article class="step-card" data-feature="10">
+                <div
+                    class="step-header"
+                    onclick="toggleCard(this.parentElement)"
+                >
+                    <div class="step-header-left">
+                        <span class="step-number">10</span>
+                        <div class="step-title-group">
+                            <div class="step-title">
+                                Edit Profile &amp; Avatar Upload
+                            </div>
+                            <div class="step-desc">
+                                Wire up the profile form, avatar upload, and
+                                privacy toggle
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-header-right">
+                        <span class="step-time">~10 min</span>
+                        <svg
+                            class="chevron"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="M6 9l6 6 6-6" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="step-body">
+                    <ol>
+                        <li>
+                            <strong>Context</strong>
+                            <p>
+                                The edit profile page at
+                                <code
+                                    >src/routes/settings/edit-profile.tsx</code
+                                >
+                                has the form UI (display name, bio, avatar) but
+                                the save button and upload logic need to be
+                                connected. The privacy toggle at
+                                <code
+                                    >src/routes/settings/account-privacy.tsx</code
+                                >
+                                also needs to be wired up.
+                            </p>
+                        </li>
+                        <li>
+                            <strong>Wire up the profile form</strong>
+                            <div class="prompt-box">
+                                <span class="prompt-label">Prompt</span>
+                                <button
+                                    class="copy-btn"
+                                    onclick="copyText(this)"
+                                >
+                                    Copy
+                                </button>
+                                <div class="prompt-content">Wire up the Edit Profile page at src/routes/settings/edit-profile.tsx. I need: 1. The form submit button to call PATCH /users/me with the display name and bio fields 2. Create a useUpdateProfileMutation hook in src/queries/settings.ts that calls the API and updates the auth user cache on success 3. Show a loading state on the submit button while saving 4. The "Change photo" button should upload an avatar image using @better-upload/client (the upload route already exists), then update the profile with the new avatar URL Check the Swagger docs for the PATCH /users/me endpoint.</div>
+                            </div>
+                        </li>
+                        <li>
+                            <strong>Wire up the privacy toggle</strong>
+                            <div class="prompt-box">
+                                <span class="prompt-label">Prompt</span>
+                                <button
+                                    class="copy-btn"
+                                    onclick="copyText(this)"
+                                >
+                                    Copy
+                                </button>
+                                <div class="prompt-content">Wire up the account privacy toggle at src/routes/settings/account-privacy.tsx. The Switch component is already rendered but needs to call PATCH /users/me with { isPrivate: true/false } when toggled. Update the auth user cache on success so the UI reflects the change immediately.</div>
+                            </div>
+                        </li>
+                        <li>
+                            <strong>Test it</strong>
+                            <div class="prompt-box">
+                                <span class="prompt-label">Prompt</span>
+                                <button
+                                    class="copy-btn"
+                                    onclick="copyText(this)"
+                                >
+                                    Copy
+                                </button>
+                                <div class="prompt-content">Open http://localhost:3000/settings/edit-profile in the browser. Take a screenshot, then change the display name and bio, click Submit, and take another screenshot to verify it saved. Then navigate to the privacy settings and toggle the switch.</div>
+                            </div>
+                        </li>
+                    </ol>
+
+                    <details class="hint">
+                        <summary>Stuck? Check these files</summary>
+                        <div class="hint-content">
+                            <ul>
+                                <li>
+                                    <code>src/queries/settings.ts</code> &mdash;
+                                    Where the update profile mutation should
+                                    live
+                                </li>
+                                <li>
+                                    <code>src/queries/auth.ts</code> &mdash; The
+                                    <code>useAuthUser</code> hook and
+                                    <code>authUser</code> query key for cache
+                                    updates
+                                </li>
+                                <li>
+                                    <code>src/lib/api.ts</code> &mdash; The API
+                                    client helper (use <code>api.patch</code>)
+                                </li>
+                            </ul>
+                        </div>
+                    </details>
+
+                    <div class="callout">
+                        <svg
+                            class="callout-icon"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path
+                                d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"
+                            />
+                            <line x1="9" y1="21" x2="15" y2="21" />
+                        </svg>
+                        <span
+                            >This is a good warm-up feature. It touches a form,
+                            a mutation, cache invalidation, and file upload
+                            &mdash; all patterns you'll reuse in the bigger
+                            features ahead.</span
+                        >
+                    </div>
+
+                    <ul class="checklist">
+                        <li onclick="toggleCheck(this)">
+                            Can update display name and bio
+                        </li>
+                        <li onclick="toggleCheck(this)">
+                            Submit button shows loading state while saving
+                        </li>
+                        <li onclick="toggleCheck(this)">
+                            Can upload a new avatar photo
+                        </li>
+                        <li onclick="toggleCheck(this)">
+                            Privacy toggle switches account between public and
+                            private
+                        </li>
+                    </ul>
+
+                    <button class="complete-btn" onclick="toggleComplete(this)">
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="M5 12l5 5L20 7" />
+                        </svg>
+                        Mark as Completed
+                    </button>
+                </div>
+            </article>
+
+            <!-- Step 11 -->
+            <article class="step-card" data-feature="11">
+                <div
+                    class="step-header"
+                    onclick="toggleCard(this.parentElement)"
+                >
+                    <div class="step-header-left">
+                        <span class="step-number">11</span>
+                        <div class="step-title-group">
+                            <div class="step-title">Create Post</div>
+                            <div class="step-desc">
+                                Build the post creation flow with image upload
+                                and caption
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-header-right">
+                        <span class="step-time">~15 min</span>
+                        <svg
+                            class="chevron"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="M6 9l6 6 6-6" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="step-body">
+                    <ol>
+                        <li>
+                            <strong>Context</strong>
+                            <p>
+                                Users need a way to create posts with images and
+                                captions. The "Create" button in the sidebar
+                                exists but doesn't do anything yet. You'll build
+                                the full creation flow &mdash; choose whichever
+                                UI pattern feels right to you.
+                            </p>
+                        </li>
+                        <li>
+                            <strong>Choose your approach</strong>
+                            <p>
+                                There are two common patterns for this. Pick the
+                                one you prefer:
+                            </p>
+                            <ul
+                                style="
+                                    list-style: disc;
+                                    padding-left: 24px;
+                                    margin: 12px 0;
+                                    font-size: 0.92rem;
+                                    color: var(--text-secondary);
+                                    line-height: 1.7;
+                                "
+                            >
+                                <li>
+                                    <strong>Dialog</strong> &mdash; A modal
+                                    overlay where the user selects images,
+                                    writes a caption, and submits. Simple and
+                                    familiar.
+                                </li>
+                                <li>
+                                    <strong>Stepper</strong> &mdash; A
+                                    multi-step flow (select images &rarr;
+                                    preview/crop &rarr; add caption &rarr;
+                                    share). Closer to Instagram's actual UX.
+                                </li>
+                            </ul>
+                            <p>
+                                Tell Claude which approach you want and let it
+                                build it.
+                            </p>
+                        </li>
+                        <li>
+                            <strong>Implementation prompt</strong>
+                            <div class="prompt-box">
+                                <span class="prompt-label"
+                                    >Prompt (dialog approach)</span
+                                >
+                                <button
+                                    class="copy-btn"
+                                    onclick="copyText(this)"
+                                >
+                                    Copy
+                                </button>
+                                <div class="prompt-content">Implement the Create Post feature as a dialog. When the user clicks "Create" in the sidebar, open a dialog where they can: 1. Drag &amp; drop or select images to upload using @better-upload/client (the upload route at /api/upload already works) 2. See previews of the selected images 3. Write a caption 4. Submit the post by calling POST /posts with the image URLs and caption 5. Close the dialog and refresh the feed on success Check the Swagger API docs for the POST /posts endpoint schema.</div>
+                            </div>
+                            <div class="prompt-box">
+                                <span class="prompt-label"
+                                    >Prompt (stepper approach)</span
+                                >
+                                <button
+                                    class="copy-btn"
+                                    onclick="copyText(this)"
+                                >
+                                    Copy
+                                </button>
+                                <div class="prompt-content">Implement the Create Post feature as a multi-step flow. When the user clicks "Create" in the sidebar, open a full-screen or dialog stepper with these steps: Step 1: Select images — drag &amp; drop zone or file picker, show thumbnails of selected files Step 2: Preview — show the images in a carousel, allow removing individual images Step 3: Caption — text input for the caption Step 4: Share — upload images using @better-upload/client (/api/upload route already works), then call POST /posts with the image URLs and caption. Show progress and redirect to feed on success. Check the Swagger API docs for the POST /posts endpoint schema.</div>
+                            </div>
+                        </li>
+                        <li>
+                            <strong>Test it</strong>
+                            <div class="prompt-box">
+                                <span class="prompt-label">Prompt</span>
+                                <button
+                                    class="copy-btn"
+                                    onclick="copyText(this)"
+                                >
+                                    Copy
+                                </button>
+                                <div class="prompt-content">Open http://localhost:3000 in the browser, click the "Create" button in the sidebar, and take a screenshot. Upload an image, write a caption, and submit. Take a screenshot of the feed to verify the post appeared.</div>
+                            </div>
+                        </li>
+                    </ol>
+
+                    <details class="hint">
+                        <summary>Stuck? Check these files</summary>
+                        <div class="hint-content">
+                            <ul>
+                                <li>
+                                    <code>src/routes/api/upload.ts</code>
+                                    &mdash; The upload server function (already
+                                    working)
+                                </li>
+                                <li>
+                                    <code>src/queries/posts.ts</code> &mdash;
+                                    Where to add the
+                                    <code>useCreatePost</code> mutation
+                                </li>
+                                <li>
+                                    <code>src/lib/api.ts</code> &mdash; The API
+                                    client helper
+                                </li>
+                                <li>
+                                    Swagger docs &mdash; Check the POST /posts
+                                    endpoint for the request schema
+                                </li>
+                            </ul>
+                        </div>
+                    </details>
+
+                    <div class="callout">
+                        <svg
+                            class="callout-icon"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path
+                                d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"
+                            />
+                            <line x1="9" y1="21" x2="15" y2="21" />
+                        </svg>
+                        <span
+                            >This is a great feature to iterate on. If Claude's
+                            first attempt isn't perfect, tell it what's wrong
+                            and let it fix it. That's the power of
+                            conversational coding.</span
+                        >
+                    </div>
+
+                    <ul class="checklist">
+                        <li onclick="toggleCheck(this)">
+                            Can open the create post UI from the sidebar
+                        </li>
+                        <li onclick="toggleCheck(this)">
+                            Can select or drag &amp; drop images
+                        </li>
+                        <li onclick="toggleCheck(this)">
+                            Can see image previews before submitting
+                        </li>
+                        <li onclick="toggleCheck(this)">Can write a caption</li>
+                        <li onclick="toggleCheck(this)">
+                            Post appears in the feed after submission
+                        </li>
+                    </ul>
+
+                    <button class="complete-btn" onclick="toggleComplete(this)">
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="M5 12l5 5L20 7" />
+                        </svg>
+                        Mark as Completed
+                    </button>
+                </div>
+            </article>
+
+            <!-- Step 12 -->
+            <article class="step-card" data-feature="12">
+                <div
+                    class="step-header"
+                    onclick="toggleCard(this.parentElement)"
+                >
+                    <div class="step-header-left">
+                        <span class="step-number">12</span>
+                        <div class="step-title-group">
+                            <div class="step-title">Likes &amp; Comments</div>
+                            <div class="step-desc">
+                                Add post interactions &mdash; like hearts and
+                                comment threads
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-header-right">
+                        <span class="step-time">~15 min</span>
+                        <svg
+                            class="chevron"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="M6 9l6 6 6-6" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="step-body">
+                    <ol>
+                        <li>
+                            <strong>Context</strong>
+                            <p>
+                                Posts appear in the feed but you can't interact
+                                with them yet. The like button and comment
+                                section need to be wired up. Start with likes
+                                (simpler), then add comments.
+                            </p>
+                        </li>
+                        <li>
+                            <strong>Implement likes</strong>
+                            <div class="prompt-box">
+                                <span class="prompt-label">Prompt</span>
+                                <button
+                                    class="copy-btn"
+                                    onclick="copyText(this)"
+                                >
+                                    Copy
+                                </button>
+                                <div class="prompt-content">Implement the Like button for posts. In the post actions area, add a heart icon button that toggles like/unlike by calling POST /posts/:id/like. The API returns the updated like count. Use an optimistic update so the UI responds instantly &mdash; the heart should fill and the count should update before the API responds. Check the Swagger docs for the exact endpoint.</div>
+                            </div>
+                        </li>
+                        <li>
+                            <strong>Implement comments</strong>
+                            <div class="prompt-box">
+                                <span class="prompt-label">Prompt</span>
+                                <button
+                                    class="copy-btn"
+                                    onclick="copyText(this)"
+                                >
+                                    Copy
+                                </button>
+                                <div class="prompt-content">Implement the comments section on the post detail view. I need: 1. A list of existing comments showing user avatar, username, and comment text 2. An "Add a comment" input at the bottom that submits on Enter 3. Ability to delete my own comments Check the Swagger docs for GET /posts/:id/comments, POST /posts/:id/comments, and DELETE /posts/:id/comments/:commentId.</div>
+                            </div>
+                        </li>
+                        <li>
+                            <strong>Test it</strong>
+                            <div class="prompt-box">
+                                <span class="prompt-label">Prompt</span>
+                                <button
+                                    class="copy-btn"
+                                    onclick="copyText(this)"
+                                >
+                                    Copy
+                                </button>
+                                <div class="prompt-content">Open http://localhost:3000 in the browser. Like a post and verify the heart fills and the count updates. Then open a post detail view, add a comment, and take a screenshot.</div>
+                            </div>
+                        </li>
+                    </ol>
+
+                    <details class="hint">
+                        <summary>Optimistic updates tip</summary>
+                        <div class="hint-content">
+                            Optimistic updates make the UI feel instant. The
+                            pattern is: update the query cache immediately on
+                            click, then let the mutation run in the background.
+                            If it fails, the cache reverts. TanStack Query makes
+                            this easy with <code>onMutate</code>,
+                            <code>onError</code>, and
+                            <code>onSettled</code> callbacks.
+                        </div>
+                    </details>
+
+                    <ul class="checklist">
+                        <li onclick="toggleCheck(this)">
+                            Heart icon toggles on click, like count updates
+                            instantly
+                        </li>
+                        <li onclick="toggleCheck(this)">
+                            Comments appear on the post detail view
+                        </li>
+                        <li onclick="toggleCheck(this)">
+                            Can add a new comment
+                        </li>
+                        <li onclick="toggleCheck(this)">
+                            Can delete own comments
+                        </li>
+                    </ul>
+
+                    <button class="complete-btn" onclick="toggleComplete(this)">
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="M5 12l5 5L20 7" />
+                        </svg>
+                        Mark as Completed
+                    </button>
+                </div>
+            </article>
+
+            <!-- Step 13 -->
+            <article class="step-card" data-feature="13">
+                <div
+                    class="step-header"
+                    onclick="toggleCard(this.parentElement)"
+                >
+                    <div class="step-header-left">
+                        <span class="step-number">13</span>
+                        <div class="step-title-group">
+                            <div class="step-title">Follow &amp; Unfollow</div>
+                            <div class="step-desc">
+                                Build the follow system with support for private
+                                accounts
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-header-right">
+                        <span class="step-time">~10 min</span>
+                        <svg
+                            class="chevron"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="M6 9l6 6 6-6" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="step-body">
+                    <ol>
+                        <li>
+                            <strong>Context</strong>
+                            <p>
+                                You can view user profiles but can't follow
+                                anyone yet. The follow button on the profile
+                                header needs to handle multiple states: follow,
+                                unfollow, and pending requests for private
+                                accounts.
+                            </p>
+                        </li>
+                        <li>
+                            <strong>Implementation prompt</strong>
+                            <div class="prompt-box">
+                                <span class="prompt-label">Prompt</span>
+                                <button
+                                    class="copy-btn"
+                                    onclick="copyText(this)"
+                                >
+                                    Copy
+                                </button>
+                                <div class="prompt-content">Implement the follow/unfollow system on user profiles. The follow button needs to handle three states: 1. "Follow" &mdash; clicking calls POST /users/:userId/follow 2. "Following" &mdash; clicking shows an unfollow option, calls DELETE /users/:userId/follow 3. "Requested" &mdash; for private accounts, shows a pending state after sending a follow request Update the follower/following counts after each action. Check the Swagger docs for all /users/:userId/follow* endpoints.</div>
+                            </div>
+                        </li>
+                        <li>
+                            <strong>Test it</strong>
+                            <div class="prompt-box">
+                                <span class="prompt-label">Prompt</span>
+                                <button
+                                    class="copy-btn"
+                                    onclick="copyText(this)"
+                                >
+                                    Copy
+                                </button>
+                                <div class="prompt-content">Navigate to another user's profile in the browser and take a screenshot. Click the follow button and take another screenshot to verify the state changed and the follower count updated.</div>
+                            </div>
+                        </li>
+                    </ol>
+
+                    <details class="hint">
+                        <summary>Multiple states are tricky</summary>
+                        <div class="hint-content">
+                            The follow button has at least 3 states: not
+                            following, following, and requested (for private
+                            accounts). Make sure to mention all states in your
+                            prompt so Claude handles the full state machine. If
+                            Claude misses a state, just tell it: "You forgot the
+                            Requested state for private accounts".
+                        </div>
+                    </details>
+
+                    <div class="callout">
+                        <svg
+                            class="callout-icon"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path
+                                d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"
+                            />
+                            <line x1="9" y1="21" x2="15" y2="21" />
+                        </svg>
+                        <span
+                            >Visit other workshop participants' profiles and
+                            follow them! This is a shared backend &mdash; you'll
+                            see each other's posts and follows in
+                            real-time.</span
+                        >
+                    </div>
+
+                    <ul class="checklist">
+                        <li onclick="toggleCheck(this)">
+                            Can follow a public user
+                        </li>
+                        <li onclick="toggleCheck(this)">Can unfollow a user</li>
+                        <li onclick="toggleCheck(this)">
+                            Follower/following counts update
+                        </li>
+                        <li onclick="toggleCheck(this)">
+                            Private accounts show "Requested" after follow
+                            attempt
+                        </li>
+                    </ul>
+
+                    <button class="complete-btn" onclick="toggleComplete(this)">
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="M5 12l5 5L20 7" />
+                        </svg>
+                        Mark as Completed
+                    </button>
+                </div>
+            </article>
+
+            <!-- ============================================================
+         PART 3
+         ============================================================ -->
+            <!-- ============================================================
+         PART 4
+         ============================================================ -->
+            <div class="part-header">
+                <h2>Part 4: Free Roam</h2>
+                <p>
+                    You've learned the core workflows and built real features.
+                    Now it's your turn &mdash; pick any direction and make this
+                    app your own.
+                </p>
+            </div>
+
+            <!-- Step 14 -->
+            <article class="step-card" data-feature="14">
+                <div
+                    class="step-header"
+                    onclick="toggleCard(this.parentElement)"
+                >
+                    <div class="step-header-left">
+                        <span class="step-number">14</span>
+                        <div class="step-title-group">
+                            <div class="step-title">Make It Yours</div>
+                            <div class="step-desc">
+                                Add any feature, redesign, or improvement you
+                                want
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-header-right">
+                        <span class="step-time">open-ended</span>
+                        <svg
+                            class="chevron"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="M6 9l6 6 6-6" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="step-body">
+                    <p>
+                        This is your playground. Pick something that interests
+                        you and build it with Claude. Here are some ideas to get
+                        you started:
+                    </p>
+
+                    <div class="step-section">
+                        <div class="step-section-title">New features</div>
+                        <ul
+                            style="
+                                list-style: disc;
+                                padding-left: 24px;
+                                margin: 8px 0;
+                                font-size: 0.92rem;
+                                color: var(--text-secondary);
+                                line-height: 1.8;
+                            "
+                        >
+                            <li>
+                                Stories &mdash; circular avatars at the top of
+                                the feed with a full-screen viewer
+                            </li>
+                            <li>
+                                Direct messages &mdash; real-time chat using the
+                                WebSocket endpoint
+                            </li>
+                            <li>
+                                Notifications &mdash; likes, follows, and
+                                comments with an unread badge
+                            </li>
+                            <li>
+                                Explore page &mdash; discover posts from users
+                                you don't follow
+                            </li>
+                            <li>
+                                Search &mdash; find users with a search bar and
+                                recent searches history
+                            </li>
+                            <li>
+                                Save/bookmark posts &mdash; toggle save and view
+                                saved posts on your profile
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="step-section">
+                        <div class="step-section-title">
+                            Design &amp; polish
+                        </div>
+                        <ul
+                            style="
+                                list-style: disc;
+                                padding-left: 24px;
+                                margin: 8px 0;
+                                font-size: 0.92rem;
+                                color: var(--text-secondary);
+                                line-height: 1.8;
+                            "
+                        >
+                            <li>
+                                Redesign the layout &mdash; try a different
+                                navigation style or grid layout
+                            </li>
+                            <li>
+                                Change the theme &mdash; new color palette,
+                                light mode, or a completely different aesthetic
+                            </li>
+                            <li>
+                                Add animations &mdash; page transitions, like
+                                heart animations, skeleton loaders
+                            </li>
+                            <li>
+                                Improve mobile responsiveness &mdash; make it
+                                feel native on small screens
+                            </li>
+                            <li>
+                                Dark/light mode toggle &mdash; let users switch
+                                themes
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="step-section">
+                        <div class="step-section-title">Example prompts</div>
+                        <div class="prompt-box">
+                            <span class="prompt-label">Prompt</span>
+                            <button class="copy-btn" onclick="copyText(this)">
+                                Copy
+                            </button>
+                            <div class="prompt-content">Redesign the feed to look more like Pinterest &mdash; a masonry grid layout with cards of varying heights instead of the current single-column feed.</div>
+                        </div>
+                        <div class="prompt-box">
+                            <span class="prompt-label">Prompt</span>
+                            <button class="copy-btn" onclick="copyText(this)">
+                                Copy
+                            </button>
+                            <div class="prompt-content">Add a double-tap to like gesture on post images. When the user double-taps, show a heart animation in the center of the image (like Instagram does) and toggle the like.</div>
+                        </div>
+                        <div class="prompt-box">
+                            <span class="prompt-label">Prompt</span>
+                            <button class="copy-btn" onclick="copyText(this)">
+                                Copy
+                            </button>
+                            <div class="prompt-content">Implement the Stories feature. I need a stories bar at the top of the feed with circular avatars, a gradient ring for unseen stories, and a full-screen story viewer that auto-advances. Check the Swagger docs for the /stories endpoints.</div>
+                        </div>
+                    </div>
+
+                    <div class="callout">
+                        <svg
+                            class="callout-icon"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path
+                                d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"
+                            />
+                            <line x1="9" y1="21" x2="15" y2="21" />
+                        </svg>
+                        <span
+                            >Use everything you've learned: Plan Mode for
+                            complex features, agents for specialized roles, the
+                            Playwright MCP to test your work, and Context7 to
+                            look up library docs. This is where it all comes
+                            together.</span
+                        >
+                    </div>
+
+                    <ul class="checklist">
+                        <li onclick="toggleCheck(this)">
+                            Picked a feature or improvement to build
+                        </li>
+                        <li onclick="toggleCheck(this)">
+                            Used Claude to implement it
+                        </li>
+                        <li onclick="toggleCheck(this)">
+                            Tested it in the browser
+                        </li>
+                    </ul>
+
+                    <button class="complete-btn" onclick="toggleComplete(this)">
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="M5 12l5 5L20 7" />
+                        </svg>
+                        Mark as Completed
+                    </button>
+                </div>
+            </article>
+
+            <!-- ============================================================
+         PART 4
+         ============================================================ -->
+            <!-- ============================================================
+         PART 5
+         ============================================================ -->
+            <div class="part-header">
+                <h2>Part 5: Tips, Tricks &amp; Resources</h2>
+                <p>
+                    Useful patterns, keyboard shortcuts, and links to keep
+                    learning.
+                </p>
+            </div>
+
+            <section class="getting-started">
+                <h2>Tips &amp; Tricks</h2>
+
+                <h3>Prompting</h3>
+                <ul>
+                    <li>
+                        <strong>Be specific about files</strong> &mdash; "In
+                        <code>src/components/feed/post-actions.tsx</code>, add a
+                        like button" works better than "add a like button
+                        somewhere".
+                    </li>
+                    <li>
+                        <strong>Reference the Swagger docs</strong> &mdash;
+                        Telling Claude to "check the Swagger docs for the
+                        endpoint" gives it the exact request/response shapes
+                        instead of guessing.
+                    </li>
+                    <li>
+                        <strong>Iterate, don't restart</strong> &mdash; If
+                        Claude gets something wrong, tell it what's wrong in the
+                        same conversation. It has full context of what it just
+                        did.
+                    </li>
+                    <li>
+                        <strong>Paste error messages</strong> &mdash; Copy-paste
+                        the full error. Claude is great at diagnosing stack
+                        traces and TypeScript errors.
+                    </li>
+                    <li>
+                        <strong>Use screenshots</strong> &mdash; "Take a
+                        screenshot and tell me what's wrong" is a powerful
+                        debugging prompt when you have Playwright MCP
+                        configured.
+                    </li>
+                </ul>
+
+                <h3>Workflow</h3>
+                <ul>
+                    <li>
+                        <strong>Plan Mode for complex features</strong> &mdash;
+                        Use <code>Shift+Tab</code> to toggle Plan Mode before
+                        starting a multi-file feature. Review the plan, then
+                        toggle back to execute.
+                    </li>
+                    <li>
+                        <strong>One feature per conversation</strong> &mdash;
+                        Start a new conversation (<code>/clear</code>) between
+                        features to keep context clean and focused.
+                    </li>
+                    <li>
+                        <strong>Compact long conversations</strong> &mdash; If a
+                        conversation gets long, use <code>/compact</code> to
+                        summarize the history and free up context space.
+                    </li>
+                    <li>
+                        <strong>Let the agent cook</strong> &mdash; For big
+                        features, give Claude the full requirements and let it
+                        work. Review the result rather than micromanaging each
+                        step.
+                    </li>
+                    <li>
+                        <strong>Use agents for different hats</strong> &mdash;
+                        Switch to the QA agent after implementing a feature to
+                        catch bugs you might have missed.
+                    </li>
+                </ul>
+
+                <h3>Keyboard shortcuts</h3>
+                <ul>
+                    <li>
+                        <kbd
+                            style="
+                                display: inline-block;
+                                padding: 2px 7px;
+                                background: var(--bg-secondary);
+                                border: 1px solid var(--border);
+                                border-radius: 4px;
+                                font-family: var(--font-mono);
+                                font-size: 0.8rem;
+                            "
+                            >Shift+Tab</kbd
+                        >
+                        &mdash; Toggle Plan Mode
+                    </li>
+                    <li>
+                        <kbd
+                            style="
+                                display: inline-block;
+                                padding: 2px 7px;
+                                background: var(--bg-secondary);
+                                border: 1px solid var(--border);
+                                border-radius: 4px;
+                                font-family: var(--font-mono);
+                                font-size: 0.8rem;
+                            "
+                            >Esc</kbd
+                        >
+                        &mdash; Cancel current generation
+                    </li>
+                    <li>
+                        <kbd
+                            style="
+                                display: inline-block;
+                                padding: 2px 7px;
+                                background: var(--bg-secondary);
+                                border: 1px solid var(--border);
+                                border-radius: 4px;
+                                font-family: var(--font-mono);
+                                font-size: 0.8rem;
+                            "
+                            >Tab</kbd
+                        >
+                        &mdash; Accept Claude's suggestion
+                    </li>
+                    <li>
+                        <kbd
+                            style="
+                                display: inline-block;
+                                padding: 2px 7px;
+                                background: var(--bg-secondary);
+                                border: 1px solid var(--border);
+                                border-radius: 4px;
+                                font-family: var(--font-mono);
+                                font-size: 0.8rem;
+                            "
+                            >Ctrl+C</kbd
+                        >
+                        &mdash; Exit Claude Code
+                    </li>
+                </ul>
+
+                <h3>Useful links</h3>
+                <ul>
+                    <li>
+                        <a
+                            href="https://fqg27fj0idic0tmq91ssdh20.178.105.11.199.sslip.io/swagger"
+                            target="_blank"
+                            >API Swagger Docs</a
+                        >
+                        &mdash; Interactive API documentation with all available
+                        endpoints and schemas
+                    </li>
+                    <li>
+                        <a
+                            href="https://docs.anthropic.com/en/docs/claude-code"
+                            target="_blank"
+                            >Claude Code Documentation</a
+                        >
+                        &mdash; Official docs covering installation,
+                        configuration, CLAUDE.md, MCP servers, agents, and more
+                    </li>
+                    <li>
+                        <a href="https://anthropic.skilljar.com" target="_blank"
+                            >Anthropic Skilljar Courses</a
+                        >
+                        &mdash; Free courses on prompt engineering, Claude best
+                        practices, and building with Claude
+                    </li>
+                </ul>
+            </section>
+        </main>
+
+        <!-- ============================================================
+       Cheat Sheet Modal
+       ============================================================ -->
+        <div class="modal-overlay" id="cheatModal">
+            <div
+                class="modal"
+                role="dialog"
+                aria-labelledby="cheatTitle"
+                aria-modal="true"
+            >
+                <div class="modal-header">
+                    <h2 id="cheatTitle">Claude Code Cheat Sheet</h2>
+                    <button
+                        class="modal-close"
+                        onclick="closeCheatSheet()"
+                        aria-label="Close cheat sheet"
+                    >
+                        &times;
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table class="cheat-table">
+                        <thead>
+                            <tr>
+                                <th>Command</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>claude</td>
+                                <td>Start Claude Code in current directory</td>
+                            </tr>
+                            <tr>
+                                <td>/init</td>
+                                <td>
+                                    Generate CLAUDE.md from codebase analysis
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>/model</td>
+                                <td>Switch between Claude models</td>
+                            </tr>
+                            <tr>
+                                <td>/plan or Shift+Tab</td>
+                                <td>Toggle Plan Mode</td>
+                            </tr>
+                            <tr>
+                                <td>/help</td>
+                                <td>Show available commands</td>
+                            </tr>
+                            <tr>
+                                <td>/clear</td>
+                                <td>Clear conversation history</td>
+                            </tr>
+                            <tr>
+                                <td>/compact</td>
+                                <td>Summarize and compact the conversation</td>
+                            </tr>
+                            <tr>
+                                <td>Esc</td>
+                                <td>Cancel current generation</td>
+                            </tr>
+                            <tr>
+                                <td>Ctrl+C</td>
+                                <td>Exit Claude Code</td>
+                            </tr>
+                            <tr>
+                                <td>Tab</td>
+                                <td>Accept Claude's suggestion</td>
+                            </tr>
+                            <tr>
+                                <td>?</td>
+                                <td>Open this cheat sheet (in workshop)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p class="modal-hint">Press <kbd>Esc</kbd> to close</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+       Scroll-to-Top Button
+       ============================================================ -->
+        <button
+            class="scroll-top"
+            id="scrollTop"
+            onclick="scrollToTop()"
+            aria-label="Scroll to top"
+        >
+            <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            >
+                <path d="M18 15l-6-6-6 6" />
+            </svg>
+        </button>
+
+        <!-- ============================================================
+       Keyboard Hint
+       ============================================================ -->
+        <div class="keyboard-hint">Press <kbd>?</kbd> for cheat sheet</div>
+
+        <!-- ============================================================
+       JavaScript
+       ============================================================ -->
+        <script>
+            /* ============================================================
+       Constants & State
+       ============================================================ */
+            const STORAGE_KEY = "claude-code-labs-instagram-progress-v2";
+            const TOTAL_STEPS = 14;
+
+            function loadState() {
+                try {
+                    const raw = localStorage.getItem(STORAGE_KEY);
+                    return raw
+                        ? JSON.parse(raw)
+                        : { completed: [], checklist: {} };
+                } catch {
+                    return { completed: [], checklist: {} };
+                }
+            }
+
+            function saveState(state) {
+                try {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+                } catch {
+                    // localStorage unavailable
+                }
+            }
+
+            /* ============================================================
+       Progress Bar
+       ============================================================ */
+            function updateProgress() {
+                const state = loadState();
+                const count = state.completed.length;
+                const pct = Math.round((count / TOTAL_STEPS) * 100);
+                document.getElementById("progressFill").style.width = pct + "%";
+                document.getElementById("progressText").textContent =
+                    count + " / " + TOTAL_STEPS + " completed";
+            }
+
+            /* ============================================================
+       Card Toggle (expand/collapse)
+       ============================================================ */
+            function toggleCard(card) {
+                const wasExpanded = card.classList.contains("expanded");
+                // Collapse all other cards
+                document
+                    .querySelectorAll(".step-card.expanded")
+                    .forEach((c) => {
+                        if (c !== card) c.classList.remove("expanded");
+                    });
+                card.classList.toggle("expanded", !wasExpanded);
+            }
+
+            /* ============================================================
+       Copy Button
+       ============================================================ */
+            function copyText(btn) {
+                const box = btn.closest(".prompt-box");
+                const content = box.querySelector(".prompt-content");
+                const text = content.textContent;
+
+                navigator.clipboard
+                    .writeText(text)
+                    .then(() => {
+                        btn.textContent = "Copied!";
+                        btn.classList.add("copied");
+                        setTimeout(() => {
+                            btn.textContent = "Copy";
+                            btn.classList.remove("copied");
+                        }, 2000);
+                    })
+                    .catch(() => {
+                        // Fallback for older browsers
+                        const textarea = document.createElement("textarea");
+                        textarea.value = text;
+                        textarea.style.position = "fixed";
+                        textarea.style.opacity = "0";
+                        document.body.appendChild(textarea);
+                        textarea.select();
+                        document.execCommand("copy");
+                        document.body.removeChild(textarea);
+                        btn.textContent = "Copied!";
+                        btn.classList.add("copied");
+                        setTimeout(() => {
+                            btn.textContent = "Copy";
+                            btn.classList.remove("copied");
+                        }, 2000);
+                    });
+            }
+
+            /* ============================================================
+       Checklist Toggle
+       ============================================================ */
+            function toggleCheck(li) {
+                li.classList.toggle("checked");
+
+                // Persist checklist state
+                const card = li.closest(".step-card");
+                const feature = card.getAttribute("data-feature");
+                const index = Array.from(li.parentElement.children).indexOf(li);
+                const state = loadState();
+
+                if (!state.checklist[feature]) state.checklist[feature] = [];
+
+                if (li.classList.contains("checked")) {
+                    if (!state.checklist[feature].includes(index)) {
+                        state.checklist[feature].push(index);
+                    }
+                } else {
+                    state.checklist[feature] = state.checklist[feature].filter(
+                        (i) => i !== index,
+                    );
+                }
+
+                saveState(state);
+            }
+
+            /* ============================================================
+       Mark as Completed
+       ============================================================ */
+            function toggleComplete(btn) {
+                const card = btn.closest(".step-card");
+                const feature = card.getAttribute("data-feature");
+                const state = loadState();
+
+                if (state.completed.includes(feature)) {
+                    // Uncomplete
+                    state.completed = state.completed.filter(
+                        (f) => f !== feature,
+                    );
+                    card.classList.remove("completed");
+                    btn.classList.remove("is-completed");
+                    btn.innerHTML =
+                        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg> Mark as Completed';
+                } else {
+                    // Complete
+                    state.completed.push(feature);
+                    card.classList.add("completed");
+                    btn.classList.add("is-completed");
+                    btn.innerHTML =
+                        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg> Completed';
+                }
+
+                saveState(state);
+                updateProgress();
+            }
+
+            /* ============================================================
+       Reset Progress
+       ============================================================ */
+            function resetProgress() {
+                if (!confirm("Reset all progress? This cannot be undone."))
+                    return;
+
+                localStorage.removeItem(STORAGE_KEY);
+
+                // Reset UI
+                document.querySelectorAll(".step-card").forEach((card) => {
+                    card.classList.remove("completed");
+                });
+
+                document.querySelectorAll(".complete-btn").forEach((btn) => {
+                    btn.classList.remove("is-completed");
+                    btn.innerHTML =
+                        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg> Mark as Completed';
+                });
+
+                document.querySelectorAll(".checklist li").forEach((li) => {
+                    li.classList.remove("checked");
+                });
+
+                updateProgress();
+            }
+
+            /* ============================================================
+       Cheat Sheet Modal
+       ============================================================ */
+            function openCheatSheet() {
+                document.getElementById("cheatModal").classList.add("open");
+            }
+
+            function closeCheatSheet() {
+                document.getElementById("cheatModal").classList.remove("open");
+            }
+
+            /* ============================================================
+       Scroll to Top
+       ============================================================ */
+            function scrollToTop() {
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+
+            /* ============================================================
+       Event Listeners
+       ============================================================ */
+
+            // Keyboard shortcuts
+            document.addEventListener("keydown", (e) => {
+                // ? opens cheat sheet (but not when typing in input/textarea)
+                if (
+                    e.key === "?" &&
+                    !["INPUT", "TEXTAREA"].includes(e.target.tagName)
+                ) {
+                    e.preventDefault();
+                    const modal = document.getElementById("cheatModal");
+                    if (modal.classList.contains("open")) {
+                        closeCheatSheet();
+                    } else {
+                        openCheatSheet();
+                    }
+                }
+
+                // Esc closes cheat sheet
+                if (e.key === "Escape") {
+                    closeCheatSheet();
+                }
+            });
+
+            // Close modal on overlay click
+            document
+                .getElementById("cheatModal")
+                .addEventListener("click", (e) => {
+                    if (e.target === e.currentTarget) {
+                        closeCheatSheet();
+                    }
+                });
+
+            // Scroll-to-top visibility
+            window.addEventListener(
+                "scroll",
+                () => {
+                    const btn = document.getElementById("scrollTop");
+                    if (window.scrollY > 400) {
+                        btn.classList.add("visible");
+                    } else {
+                        btn.classList.remove("visible");
+                    }
+                },
+                { passive: true },
+            );
+
+            /* ============================================================
+       Restore State on Load
+       ============================================================ */
+            function restoreState() {
+                const state = loadState();
+
+                // Restore completed steps
+                state.completed.forEach((feature) => {
+                    const card = document.querySelector(
+                        `.step-card[data-feature="${feature}"]`,
+                    );
+                    if (!card) return;
+
+                    card.classList.add("completed");
+                    const btn = card.querySelector(".complete-btn");
+                    if (btn) {
+                        btn.classList.add("is-completed");
+                        btn.innerHTML =
+                            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg> Completed';
+                    }
+                });
+
+                // Restore checklist items
+                Object.keys(state.checklist).forEach((feature) => {
+                    const card = document.querySelector(
+                        `.step-card[data-feature="${feature}"]`,
+                    );
+                    if (!card) return;
+
+                    const items = card.querySelectorAll(".checklist li");
+                    state.checklist[feature].forEach((index) => {
+                        if (items[index]) items[index].classList.add("checked");
+                    });
+                });
+
+                updateProgress();
+            }
+
+            // Init
+            restoreState();
+        </script>
+    </body>
+</html>
