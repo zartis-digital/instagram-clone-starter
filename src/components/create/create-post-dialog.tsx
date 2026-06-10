@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react"
+import { toast } from "sonner"
 import { useForm } from "@tanstack/react-form"
 import { useUploadFiles } from "@better-upload/client"
 import { ArrowLeft, ChevronDown, MapPin, SmilePlus } from "lucide-react"
@@ -42,6 +43,7 @@ export function CreatePostDialog({
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const [showAccessibility, setShowAccessibility] = useState(false)
   const [showAdvanced, setShowAdvanced] = useState(false)
+  const [postError, setPostError] = useState<string | null>(null)
 
   const {
     upload,
@@ -63,11 +65,35 @@ export function CreatePostDialog({
       hideLikes: false,
       hideComments: false,
     } as PostFormValues,
-    onSubmit: ({ value: _value }) => {
-      // TODO [Step 7]: Submit the post (rename _value back to value first)
-      // 1. Build imageUrls from uploadedFiles: uploadedFiles.map(f => `${STORAGE_PUBLIC_BASE}/${f.objectInfo.key}`)
-      // 2. Call createPost.mutate({ imageUrls, caption: value.caption || undefined })
-      // 3. In the onSuccess callback, close the dialog and call resetAll()
+    onSubmit: ({ value }) => {
+      const imageUrls = uploadedFiles.map(
+        (f) => `${STORAGE_PUBLIC_BASE}/${f.objectInfo.key}`
+      )
+      setPostError(null)
+      createPost.mutate(
+        {
+          imageUrls,
+          caption: value.caption || undefined,
+          location: value.location || undefined,
+          altText: value.altText || undefined,
+          hideLikes: value.hideLikes,
+          hideComments: value.hideComments,
+        },
+        {
+          onSuccess: () => {
+            toast.success("Your post has been shared!")
+            onOpenChange(false)
+            resetAll()
+          },
+          onError: (err) => {
+            setPostError(
+              err instanceof Error
+                ? err.message
+                : "Failed to share post. Please try again."
+            )
+          },
+        }
+      )
     },
   })
 
@@ -76,6 +102,7 @@ export function CreatePostDialog({
     setShowAccessibility(false)
     setShowAdvanced(false)
     setSelectedFiles([])
+    setPostError(null)
     form.reset()
     resetUpload()
   }, [resetUpload, form])
@@ -132,15 +159,19 @@ export function CreatePostDialog({
               Next
             </Button>
           ) : (
-            <Button
-              variant="link"
-              size="sm"
-              disabled={createPost.isPending}
-              onClick={() => form.handleSubmit()}
-              className="text-sm font-semibold text-blue-500 no-underline hover:text-white hover:no-underline"
-            >
-              Share
-            </Button>
+            <form.Subscribe selector={(s) => s.values.caption}>
+              {(captionValue) => (
+                <Button
+                  variant="link"
+                  size="sm"
+                  disabled={createPost.isPending || !captionValue.trim()}
+                  onClick={() => form.handleSubmit()}
+                  className="text-sm font-semibold text-blue-500 no-underline hover:text-white hover:no-underline"
+                >
+                  {createPost.isPending ? "Sharing..." : "Share"}
+                </Button>
+              )}
+            </form.Subscribe>
           )}
         </div>
 
@@ -350,6 +381,10 @@ export function CreatePostDialog({
                   </div>
                 )}
               </div>
+
+              {postError && (
+                <p className="px-4 py-3 text-sm text-red-400">{postError}</p>
+              )}
           </form>
         )}
       </DialogContent>

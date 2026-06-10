@@ -1,20 +1,26 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { api } from "../lib/api"
 
-// TODO [Step 7]: Implement useCreatePostMutation
-// This hook should:
-// 1. Use useMutation from @tanstack/react-query
-// 2. Call POST /posts with { imageUrls, caption }
-// 3. On success, invalidate feed, explore, profile, and userPosts queries
-// Hint: Use api.post from ../lib/api
 export function useCreatePostMutation() {
-  return {
-    mutate: (
-      _data: { imageUrls: string[]; caption?: string },
-      _options?: { onSuccess?: () => void }
-    ) => {},
-    isPending: false,
-  }
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: {
+      imageUrls: string[]
+      caption?: string
+      location?: string
+      altText?: string
+      hideLikes?: boolean
+      hideComments?: boolean
+    }) => api.post("/posts", data),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["feed"] })
+      queryClient.invalidateQueries({ queryKey: ["explore"] })
+      queryClient.invalidateQueries({ queryKey: ["profile"] })
+      queryClient.invalidateQueries({ queryKey: ["userPosts"] })
+    },
+  })
 }
 
 export function useCreateStoryMutation() {

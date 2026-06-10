@@ -1,6 +1,7 @@
 import type { QueryClient } from "@tanstack/react-query"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 import { Outlet, createRootRouteWithContext } from "@tanstack/react-router"
+import { Toaster } from "sonner"
 
 import { SidebarProvider } from "../components/sidebar/sidebar-context"
 import { MessagesProvider } from "../components/messages/messages-context"
@@ -31,6 +32,7 @@ function RootComponent() {
         <MessagesProvider>
           <UserPresence />
           <Outlet />
+          <Toaster theme="dark" position="top-right" />
           <ReactQueryDevtools buttonPosition="bottom-left" />
         </MessagesProvider>
       </SidebarProvider>
