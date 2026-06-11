@@ -61,13 +61,66 @@ export function useSavedPostsQuery() {
 }
 
 export function useLikeMutation() {
-  // TODO: mutation implementation removed
-  return {
-    mutate: () => {},
-    isPending: false,
-    isError: false,
-    error: null,
-  }
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (postId: number) =>
+      api.post<{ success: boolean; liked: boolean }>(`/posts/${postId}/like`),
+
+    onMutate: async (postId) => {
+      await queryClient.cancelQueries({ queryKey: ["feed"] })
+      await queryClient.cancelQueries({ queryKey: ["post", String(postId)] })
+
+      const previousFeed = queryClient.getQueryData(["feed"])
+      const previousPost = queryClient.getQueryData(["post", String(postId)])
+
+      queryClient.setQueryData(
+        ["feed"],
+        (old: { pages: PaginatedFeedResponse[]; pageParams: unknown[] } | undefined) => {
+          if (!old) return old
+          return {
+            ...old,
+            pages: old.pages.map((page) => ({
+              ...page,
+              posts: page.posts.map((post) =>
+                post.id === postId
+                  ? {
+                      ...post,
+                      likedByMe: !post.likedByMe,
+                      likeCount: post.likedByMe ? post.likeCount - 1 : post.likeCount + 1,
+                    }
+                  : post
+              ),
+            })),
+          }
+        }
+      )
+
+      queryClient.setQueryData(
+        ["post", String(postId)],
+        (old: PostDetail | undefined) => {
+          if (!old) return old
+          return {
+            ...old,
+            likedByMe: !old.likedByMe,
+            likeCount: old.likedByMe ? old.likeCount - 1 : old.likeCount + 1,
+          }
+        }
+      )
+
+      return { previousFeed, previousPost }
+    },
+
+    onError: (_err, postId, context) => {
+      if (context?.previousFeed) queryClient.setQueryData(["feed"], context.previousFeed)
+      if (context?.previousPost) queryClient.setQueryData(["post", String(postId)], context.previousPost)
+    },
+
+    onSettled: (_data, _err, postId) => {
+      queryClient.invalidateQueries({ queryKey: ["feed"] })
+      queryClient.invalidateQueries({ queryKey: ["post", String(postId)] })
+    },
+  })
 }
 
 export function useSaveMutation() {
@@ -132,32 +185,88 @@ export function useDeletePostMutation() {
   })
 }
 
-// TODO [Step 8]: Implement useCommentLikeMutation
-// This hook should:
-// 1. If liked, call DELETE /posts/:postId/comments/:commentId/like
-// 2. If not liked, call POST /posts/:postId/comments/:commentId/like
-// 3. On success, invalidate the post query
 export function useCommentLikeMutation() {
-  return {
-    mutate: (_data: {
-      postId: number
-      commentId: number
-      liked: boolean
-    }) => {},
-    isPending: false,
-  }
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ postId, commentId, liked }: { postId: number; commentId: number; liked: boolean }) =>
+      liked
+        ? api.delete<{ success: boolean }>(`/posts/${postId}/comments/${commentId}/like`)
+        : api.post<{ success: boolean }>(`/posts/${postId}/comments/${commentId}/like`),
+
+    onMutate: async ({ postId, commentId, liked }) => {
+      await queryClient.cancelQueries({ queryKey: ["post", String(postId)] })
+      const previous = queryClient.getQueryData(["post", String(postId)])
+
+      queryClient.setQueryData(
+        ["post", String(postId)],
+        (old: PostDetail | undefined) => {
+          if (!old) return old
+          return {
+            ...old,
+            comments: old.comments.map((c) =>
+              c.id === commentId ? { ...c, likedByMe: !liked } : c
+            ),
+          }
+        }
+      )
+
+      return { previous }
+    },
+
+    onError: (_err, { postId }, context) => {
+      if (context?.previous) queryClient.setQueryData(["post", String(postId)], context.previous)
+    },
+
+    onSettled: (_data, _err, { postId }) => {
+      queryClient.invalidateQueries({ queryKey: ["post", String(postId)] })
+    },
+  })
 }
 
-// TODO [Step 8]: Implement useCommentMutation
-// This hook should:
-// 1. Call POST /posts/:postId/comments with { content }
-// 2. On success, invalidate the post query and feed query
 export function useCommentMutation() {
-  return {
-    mutate: (
-      _data: { postId: number; content: string },
-      _options?: { onSuccess?: () => void }
-    ) => {},
-    isPending: false,
-  }
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ postId, content }: { postId: number; content: string }) =>
+      api.post<{ success: boolean }>(`/posts/${postId}/comments`, { content }),
+
+    onSettled: (_data, _err, { postId }) => {
+      queryClient.invalidateQueries({ queryKey: ["post", String(postId)] })
+      queryClient.invalidateQueries({ queryKey: ["feed"] })
+    },
+  })
+}
+
+export function useDeleteCommentMutation() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ postId, commentId }: { postId: number; commentId: number }) =>
+      api.delete<{ success: boolean }>(`/posts/${postId}/comments/${commentId}`),
+
+    onMutate: async ({ postId, commentId }) => {
+      await queryClient.cancelQueries({ queryKey: ["post", String(postId)] })
+      const previous = queryClient.getQueryData(["post", String(postId)])
+
+      queryClient.setQueryData(
+        ["post", String(postId)],
+        (old: PostDetail | undefined) => {
+          if (!old) return old
+          return { ...old, comments: old.comments.filter((c) => c.id !== commentId) }
+        }
+      )
+
+      return { previous }
+    },
+
+    onError: (_err, { postId }, context) => {
+      if (context?.previous) queryClient.setQueryData(["post", String(postId)], context.previous)
+    },
+
+    onSettled: (_data, _err, { postId }) => {
+      queryClient.invalidateQueries({ queryKey: ["post", String(postId)] })
+      queryClient.invalidateQueries({ queryKey: ["feed"] })
+    },
+  })
 }

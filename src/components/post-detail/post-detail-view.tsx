@@ -25,6 +25,7 @@ import {
   useCommentMutation,
   useCommentLikeMutation,
   useDeletePostMutation,
+  useDeleteCommentMutation,
 } from "../../queries/posts"
 
 function formatCount(n: number): string {
@@ -63,6 +64,7 @@ export function PostDetailView({ post }: { post: PostDetail }) {
   const commentMutation = useCommentMutation()
   const commentLikeMutation = useCommentLikeMutation()
   const deleteMutation = useDeletePostMutation()
+  const deleteCommentMutation = useDeleteCommentMutation()
   const [commentText, setCommentText] = useState("")
   const [shareOpen, setShareOpen] = useState(false)
   const isOwner = authUser?.id === post.userId
@@ -142,44 +144,61 @@ export function PostDetailView({ post }: { post: PostDetail }) {
           )}
 
           {/* Comments */}
-          {post.comments.map((comment) => (
-            <div key={comment.id} className="mb-4 flex gap-3">
-              <UserAvatar user={comment.user} />
-              <div className="flex-1">
-                <p className="text-sm text-white">
-                  <span className="font-semibold">
-                    {comment.user.username}
-                  </span>{" "}
-                  {comment.content}
-                </p>
-                <div className="mt-1 flex items-center gap-3 text-xs text-[#a8a8a8]">
-                  <span>{formatRelativeTime(comment.createdAt)}</span>
-                  <button type="button" className="font-semibold">
-                    Reply
-                  </button>
+          {post.comments.map((comment) => {
+            const isCommentOwner = authUser?.id === comment.userId
+            return (
+              <div key={comment.id} className="group mb-4 flex gap-3">
+                <UserAvatar user={comment.user} />
+                <div className="flex-1">
+                  <p className="text-sm text-white">
+                    <span className="font-semibold">
+                      {comment.user.username}
+                    </span>{" "}
+                    {comment.content}
+                  </p>
+                  <div className="mt-1 flex items-center gap-3 text-xs text-[#a8a8a8]">
+                    <span>{formatRelativeTime(comment.createdAt)}</span>
+                    <button type="button" className="font-semibold">
+                      Reply
+                    </button>
+                    {isCommentOwner && (
+                      <button
+                        type="button"
+                        className="font-semibold text-red-400 opacity-0 transition-opacity group-hover:opacity-100"
+                        onClick={() =>
+                          deleteCommentMutation.mutate({
+                            postId: post.id,
+                            commentId: comment.id,
+                          })
+                        }
+                      >
+                        Delete
+                      </button>
+                    )}
+                  </div>
                 </div>
+                <button
+                  type="button"
+                  className="self-start pt-1"
+                  onClick={() =>
+                    commentLikeMutation.mutate({
+                      postId: post.id,
+                      commentId: comment.id,
+                      liked: comment.likedByMe,
+                    })
+                  }
+                >
+                  <Heart
+                    className={`size-3 transition-colors ${
+                      comment.likedByMe
+                        ? "fill-[#ff3040] text-[#ff3040]"
+                        : "text-[#a8a8a8] hover:text-white/70"
+                    }`}
+                  />
+                </button>
               </div>
-              <button
-                type="button"
-                className="self-start pt-1"
-                onClick={() =>
-                  commentLikeMutation.mutate({
-                    postId: post.id,
-                    commentId: comment.id,
-                    liked: comment.likedByMe,
-                  })
-                }
-              >
-                <Heart
-                  className={`size-3 transition-colors ${
-                    comment.likedByMe
-                      ? "fill-[#ff3040] text-[#ff3040]"
-                      : "text-[#a8a8a8] hover:text-white/70"
-                  }`}
-                />
-              </button>
-            </div>
-          ))}
+            )
+          })}
         </div>
 
         {/* Action bar */}
