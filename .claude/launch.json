@@ -6,6 +6,12 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["serve", "-p", "4321", "."],
       "port": 4321
+    },
+    {
+      "name": "dev",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": ["run", "dev", "--port", "5174"],
+      "port": 5174
     }
   ]
 }
